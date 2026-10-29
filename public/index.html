@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SightGuide">
-  <link rel="stylesheet" href="styles.css?v=3.6">
+  <link rel="stylesheet" href="styles.css?v=3.7">
 </head>
 <body class="desktop-view-active">
   <a class="skip-link" href="#guidanceText">Skip to current guidance</a>
@@ -216,7 +216,10 @@
             <p class="camera-banner-text" id="cameraBannerText">Camera is not available.</p>
             <div class="camera-banner-actions">
               <button class="btn-mini btn-primary" id="photoFallbackBtn" type="button">Take a photo instead</button>
-              <button class="btn-mini btn-accent" id="bannerDemoBtn" type="button">Use Demo Mode</button>
+              <button class="btn-mini btn-accent" id="bannerDemoBtn" type="button">
+                <svg class="btn-micro-svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Launch Interactive Demo</span>
+              </button>
             </div>
             <input type="file" id="photoFallbackInput" accept="image/*" capture="environment" hidden>
           </div>
@@ -953,6 +956,6 @@
   </footer>
 
   <!-- Scripts -->
-  <script type="module" src="app.js?v=3.6"></script>
+  <script type="module" src="app.js?v=3.7"></script>
 </body>
 </html>

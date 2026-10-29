@@ -16,6 +16,7 @@ const BOX_COLORS = {
 
 const bgImages = {};
 function getBgImage(src) {
+  if (typeof Image === "undefined") return null;
   if (!bgImages[src]) {
     const img = new Image();
     img.src = src;
@@ -79,6 +80,23 @@ export function drawMaskOverlay(canvas, tracks, label, opts = {}) {
   ctx.moveTo(topX2, corridorTopY);
   ctx.lineTo(botX2, corridorBotY);
   ctx.stroke();
+  ctx.restore();
+
+  // Dynamic AR scanning beam sweeping down the walking corridor in real-time
+  const now = Date.now();
+  const sweepProgress = (now % 2200) / 2200;
+  const sweepY = corridorTopY + (corridorBotY - corridorTopY) * sweepProgress;
+  const sweepW = corridorTopW + (corridorBottomW - corridorTopW) * sweepProgress;
+  const sweepX = (w - sweepW) / 2;
+
+  ctx.save();
+  const sweepGrad = ctx.createLinearGradient(sweepX, sweepY - 3, sweepX, sweepY + 3);
+  const beamColor = hasCorridorHazard ? "rgba(239, 68, 68, " : "rgba(56, 189, 248, ";
+  sweepGrad.addColorStop(0, beamColor + "0)");
+  sweepGrad.addColorStop(0.5, beamColor + "0.65)");
+  sweepGrad.addColorStop(1, beamColor + "0)");
+  ctx.fillStyle = sweepGrad;
+  ctx.fillRect(sweepX, sweepY - 2, sweepW, 4);
   ctx.restore();
 
   for (const t of tracks) {
@@ -184,7 +202,7 @@ export function drawDemoScene(canvas, tracks, frameNo, scenarioId = "all") {
 
   // Use realistic background photo if loaded, or polished vector scene
   let bg = defaultStreetImg;
-  if (scenarioId === "steps" && stepsImg.complete) bg = stepsImg;
+  if (scenarioId === "steps" && stepsImg?.complete) bg = stepsImg;
 
   if (bg && bg.complete && bg.naturalWidth > 0) {
     ctx.drawImage(bg, 0, 0, w, h);
@@ -250,7 +268,7 @@ export function drawDemoScene(canvas, tracks, frameNo, scenarioId = "all") {
     const x = t.box.x * w, y = t.box.y * h, bw = t.box.width * w, bh = t.box.height * h;
     const color = BOX_COLORS[t.category] || "#f59e0b";
 
-    if (t.category === "person" && (!bg.complete || bg === stepsImg)) {
+    if (t.category === "person" && (!bg?.complete || bg === stepsImg)) {
       ctx.fillStyle = "#1e293b";
       ctx.beginPath();
       ctx.arc(x + bw / 2, y + 14, 10, 0, Math.PI * 2);
@@ -260,9 +278,72 @@ export function drawDemoScene(canvas, tracks, frameNo, scenarioId = "all") {
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(x + bw * 0.25, y + 26 + bh * 0.4, bw * 0.22, bh * 0.5);
       ctx.fillRect(x + bw * 0.53, y + 26 + bh * 0.4, bw * 0.22, bh * 0.5);
-    } else if (t.category === "fixed_obstacle" && (!bg.complete || bg === stepsImg)) {
+    } else if (t.category === "fixed_obstacle" && (!bg?.complete || bg === stepsImg)) {
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(x + bw / 2 - 4, y, 8, bh);
     }
   }
+}
+
+export function drawStandbyOverlay(canvas) {
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Subtle safe corridor guidelines
+  const corridorTopW = w * 0.32;
+  const corridorBottomW = w * 0.54;
+  const topX1 = (w - corridorTopW) / 2;
+  const topX2 = topX1 + corridorTopW;
+  const botX1 = (w - corridorBottomW) / 2;
+  const botX2 = botX1 + corridorBottomW;
+  const corridorTopY = h * 0.40;
+  const corridorBotY = h - 38;
+
+  ctx.save();
+  ctx.setLineDash([4, 6]);
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = "rgba(56, 189, 248, 0.28)";
+
+  ctx.beginPath();
+  ctx.moveTo(topX1, corridorTopY);
+  ctx.lineTo(botX1, corridorBotY);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(topX2, corridorTopY);
+  ctx.lineTo(botX2, corridorBotY);
+  ctx.stroke();
+
+  // Standby Center Reticle with subtle pulse
+  const cx = w / 2;
+  const cy = h * 0.48;
+  const pulse = Math.sin(Date.now() / 400) * 3;
+  ctx.setLineDash([]);
+  ctx.strokeStyle = "rgba(56, 189, 248, 0.45)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28 + pulse, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Reticle crosshair ticks
+  ctx.beginPath();
+  ctx.moveTo(cx - 36, cy); ctx.lineTo(cx - 20, cy);
+  ctx.moveTo(cx + 20, cy); ctx.lineTo(cx + 36, cy);
+  ctx.moveTo(cx, cy - 36); ctx.lineTo(cx, cy - 20);
+  ctx.moveTo(cx, cy + 20); ctx.lineTo(cx, cy + 36);
+  ctx.stroke();
+
+  // Center standby pill
+  ctx.font = "bold 11px Inter, -apple-system, BlinkMacSystemFont, sans-serif";
+  const statusTxt = "SightGuide Ready · Tap Start Live or Demo";
+  const pillW = ctx.measureText(statusTxt).width + 20;
+  ctx.fillStyle = "rgba(11, 27, 51, 0.85)";
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect((w - pillW) / 2, cy + 42, pillW, 24, 6) : ctx.fillRect((w - pillW) / 2, cy + 42, pillW, 24);
+  ctx.fill();
+  ctx.fillStyle = "#38bdf8";
+  ctx.fillText(statusTxt, (w - pillW) / 2 + 10, cy + 58);
+
+  ctx.restore();
 }

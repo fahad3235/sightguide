@@ -26,6 +26,22 @@ const publicDir = path.resolve(finalDir, "public");
 fs.copyFileSync(path.resolve(publicDir, "app.js"), path.resolve(netlifyDir, "app.js"));
 fs.copyFileSync(path.resolve(publicDir, "styles.css"), path.resolve(netlifyDir, "styles.css"));
 fs.copyFileSync(path.resolve(publicDir, "index.html"), path.resolve(netlifyDir, "index.html"));
+if (fs.existsSync(path.resolve(publicDir, "sw.js"))) {
+  fs.copyFileSync(path.resolve(publicDir, "sw.js"), path.resolve(netlifyDir, "sw.js"));
+}
+if (fs.existsSync(path.resolve(publicDir, "manifest.json"))) {
+  fs.copyFileSync(path.resolve(publicDir, "manifest.json"), path.resolve(netlifyDir, "manifest.json"));
+}
+
+// Copy demo directory
+const demoDir = path.resolve(publicDir, "demo");
+const netlifyDemoDir = path.resolve(netlifyDir, "demo");
+if (fs.existsSync(demoDir)) {
+  if (!fs.existsSync(netlifyDemoDir)) fs.mkdirSync(netlifyDemoDir, { recursive: true });
+  for (const file of fs.readdirSync(demoDir)) {
+    fs.copyFileSync(path.resolve(demoDir, file), path.resolve(netlifyDemoDir, file));
+  }
+}
 
 // Copy public assets folder (images, icons, svgs)
 const assetsDir = path.resolve(publicDir, "assets");

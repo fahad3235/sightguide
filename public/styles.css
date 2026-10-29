@@ -371,6 +371,16 @@ select {
   color: var(--color-card-white);
 }
 
+.header-action-btn.header-btn-running {
+  background: #dc2626 !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+
+.header-action-btn.header-btn-running:hover {
+  background: #b91c1c !important;
+}
+
 .header-action-btn.btn-primary:hover {
   background: var(--blue-hover);
 }

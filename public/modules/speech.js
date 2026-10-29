@@ -339,16 +339,18 @@ export function unlockSpeech() {
     ctx.resume().catch(() => {});
   }
 
-  // 2. Resume SpeechSynthesis safely without empty utterance deadlocks
+  // 2. Resume SpeechSynthesis safely and prime voices
   if ("speechSynthesis" in window) {
     try {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
+      // Force Chromium/WebKit to load voices into cache on user gesture
+      window.speechSynthesis.getVoices();
     } catch {}
   }
 
-  // 3. Prime HTML5 Audio element on mobile touch gesture
+  // 3. Prime HTML5 Audio element on touch/pointer gesture
   if (!currentAudioEl && typeof Audio !== "undefined") {
     try {
       currentAudioEl = new Audio();
@@ -514,6 +516,9 @@ async function playServerAudioTts(text, opts = {}) {
         currentAudioEl.onended = () => {
           handleEnd();
         };
+        currentAudioEl.onerror = () => {
+          handleEnd();
+        };
         return true;
       }
     }
@@ -576,16 +581,19 @@ function executeSpeak(cleanText, opts = {}) {
   let nativeStarted = false;
   let fallbackTimer = null;
 
-  // Safety watchdog: If native speech does not produce sound within 350ms,
-  // seamlessly switch to audio so the phone ALWAYS speaks!
+  // Safety watchdog: If native speech does not produce sound within 1500ms and is NOT speaking,
+  // seamlessly switch to audio so the user ALWAYS hears speech!
   fallbackTimer = setTimeout(() => {
     if (!nativeStarted && isSpeaking) {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        try { window.speechSynthesis.cancel(); } catch {}
+      const isActuallySpeaking = typeof window !== "undefined" && "speechSynthesis" in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending);
+      if (!isActuallySpeaking) {
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          try { window.speechSynthesis.cancel(); } catch {}
+        }
+        playServerAudioTts(localizedText, { ...opts, skipTranslate: true, lang });
       }
-      playServerAudioTts(localizedText, { ...opts, skipTranslate: true, lang });
     }
-  }, 350);
+  }, 1500);
 
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
     try {

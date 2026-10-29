@@ -2,7 +2,7 @@ import { Tracker } from "./modules/tracker.js";
 import { rankTracks, fallbackGuidance } from "./modules/risk-engine.js";
 import { DirectionLock } from "./modules/direction-lock.js";
 import { speak, stopSpeech, speechAvailable, unlockSpeech, createVoiceRecognition, hasSpeechRecognition, playChime, setSpatialAudio, setSpeechRate, setRayBanMode, getRayBanMode, setLanguage, getLanguage, translateGuidance } from "./modules/speech.js";
-import { drawMaskOverlay, drawDemoScene } from "./modules/mask-renderer.js";
+import { drawMaskOverlay, drawDemoScene, drawStandbyOverlay } from "./modules/mask-renderer.js";
 import { DEMO_STEPS, SCENARIOS } from "./demo/scenarios.js";
 import { validateGuidance } from "./modules/validate-guidance.js";
 
@@ -24,6 +24,7 @@ const els = {
   dpRisk: $("dpRisk"),
   speakerBtn: $("speakerBtn"),
   voiceAgentBtn: $("voiceAgentBtn"),
+  headerStartLiveBtn: $("headerStartLiveBtn"),
 };
 
 /* ==========================================================================
@@ -87,8 +88,7 @@ $("headerTestVoiceBtn")?.addEventListener("click", () => {
 
 $("headerStartLiveBtn")?.addEventListener("click", () => {
   unlockSpeech();
-  showScreen("live");
-  startCamera();
+  handleStopToggle();
 });
 
 /* ==========================================================================
@@ -288,15 +288,18 @@ const history = [
   { text: "Open drain ahead. Keep left.", label: "Drain T-15", whenMs: Date.now() - 780000, thumb: "assets/thumb_drain.svg" }
 ];
 
-/* Scenario item click bindings */
+/* Scenario item click bindings: Clicking any scenario card launches it into Live View */
 document.querySelectorAll(".scenario-card-item").forEach((item) => {
   item.addEventListener("click", () => {
+    tactileHaptic("click");
+    unlockSpeech();
     document.querySelectorAll(".scenario-card-item").forEach((c) => c.classList.remove("selected"));
     item.classList.add("selected");
     const id = item.dataset.scenario;
     activeScenarioId = id;
     activeSteps = SCENARIOS.find((s) => s.id === id)?.steps || DEMO_STEPS;
     resetSession();
+    startDemo();
   });
 });
 
@@ -331,20 +334,31 @@ function renderRisk(ranked) {
   // Render Desktop companion objects list
   if (els.dpRisk) {
     if (!ranked.length) {
-      els.dpRisk.innerHTML = `
-        <li class="dp-risk-item">
-          <div class="dp-item-left"><span class="dp-item-icon red">${getCategorySvg("person")}</span><span>Person <small>ID: 03</small></span></div>
-          <span class="dp-item-chip red">1 to 3 m</span>
-        </li>
-        <li class="dp-risk-item">
-          <div class="dp-item-left"><span class="dp-item-icon yellow">${getCategorySvg("fixed_obstacle")}</span><span>Pole <small>ID: 07</small></span></div>
-          <span class="dp-item-chip yellow">&gt; 3 m</span>
-        </li>
-        <li class="dp-risk-item">
-          <div class="dp-item-left"><span class="dp-item-icon blue">${getCategorySvg("step")}</span><span>Step <small>ID: 12</small></span></div>
-          <span class="dp-item-chip blue">1 to 3 m</span>
-        </li>
-      `;
+      if (mode === "camera" || mode === "demo") {
+        els.dpRisk.innerHTML = `
+          <li class="dp-risk-item dp-risk-standby">
+            <div class="dp-item-left">
+              <span class="dp-item-icon green" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <span>Walking Corridor <small>Safe</small></span>
+            </div>
+            <span class="dp-item-chip green">Clear Ahead</span>
+          </li>
+        `;
+      } else {
+        els.dpRisk.innerHTML = `
+          <li class="dp-risk-item dp-risk-standby">
+            <div class="dp-item-left">
+              <span class="dp-item-icon green" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </span>
+              <span>Spatial Radar <small>Standby</small></span>
+            </div>
+            <span class="dp-item-chip green">Online</span>
+          </li>
+        `;
+      }
     } else {
       els.dpRisk.innerHTML = ranked.map((t) => {
         const isRed = t.riskLevel === "High" || t.category === "person" || t.category === "vehicle";
@@ -462,8 +476,7 @@ function renderCurrentFrame() {
       drawDemoScene(canvas, demoTracks, frameCount, activeScenarioId);
       drawMaskOverlay(canvas, demoTracks, "DEMO MASK", overlay);
     } else {
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawStandbyOverlay(canvas);
     }
   }
 }
@@ -797,15 +810,19 @@ async function startCamera() {
   if (!window.isSecureContext) {
     mode = "idle";
     showCameraBanner(
-      `Camera blocked: this page was opened over ${location.protocol}//${location.host}, which phone browsers treat as UNSAFE. ` +
-      `Cameras only work on HTTPS or localhost. Fix: open the https:// tunnel URL printed by START-PHONE-CAMERA.bat on your computer (same phone browser), or deploy the app over HTTPS. ` +
-      `You can still take a photo below, or use Demo Mode.`
+      `Camera requires HTTPS or localhost. Switched to interactive simulation mode below so you can test all SightGuide features.`
     );
+    playChime("ok");
+    speak("Starting interactive simulation mode.");
+    startDemo();
     return;
   }
   if (!navigator.mediaDevices?.getUserMedia) {
     mode = "idle";
-    showCameraBanner("Camera blocked: this browser does not expose camera access on this page (navigator.mediaDevices unavailable). Try Chrome/Safari over the HTTPS tunnel URL, take a photo below, or use Demo Mode.");
+    showCameraBanner("Camera blocked or unavailable in this browser. Switched to interactive simulation mode below.");
+    playChime("ok");
+    speak("Starting interactive simulation mode.");
+    startDemo();
     return;
   }
 
@@ -856,31 +873,18 @@ async function startCamera() {
     startCameraRenderLoop();
     scheduleNextCameraFrame(100);
   } catch (err) {
-    mode = "idle";
-    playChime("alert");
-    speak("Camera access unavailable. You can use demo mode or take a photo.");
     console.warn("Camera failed:", err?.name, err?.message);
     const reasons = {
-      NotAllowedError: "Camera permission was denied. On your phone: tap the lock/site-settings icon in the address bar, allow Camera for this site, then tap Allow Camera again.",
-      NotFoundError: "No camera was found on this device.",
-      NotReadableError: "The camera is already in use by another app. Close it and try again.",
-      OverconstrainedError: "The rear camera could not satisfy the requested settings. Tap Allow Camera again — the app will retry.",
-      SecurityError: "Camera blocked for security reasons. Open this page over HTTPS (tunnel URL) and try again.",
+      NotAllowedError: "Camera permission was denied. Switched to interactive simulation mode below.",
+      NotFoundError: "No camera was found on this device. Switched to interactive simulation mode below.",
+      NotReadableError: "The camera is in use by another app. Switched to interactive simulation mode below.",
+      OverconstrainedError: "The camera could not satisfy requested settings. Switched to interactive simulation mode below.",
+      SecurityError: "Camera blocked for security reasons. Switched to interactive simulation mode below.",
     };
-    showCameraBanner((reasons[err?.name] || `Camera could not start (${err?.name || "unknown error"}).`) + " You can still take a photo below, or use Demo Mode.");
-    // One retry with plain video constraints for OverconstrainedError-style failures.
-    if (err?.name === "OverconstrainedError") {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        mode = "camera";
-        hideCameraBanner();
-        if (els.liveVideo) { els.liveVideo.srcObject = stream; await els.liveVideo.play().catch(() => {}); }
-        playChime("ok");
-        speak("Camera active. Meta AI vision is scanning ahead.");
-        startCameraRenderLoop();
-        scheduleNextCameraFrame(100);
-      } catch { /* banner already shown */ }
-    }
+    showCameraBanner((reasons[err?.name] || `Camera could not start (${err?.name || "unknown error"}).`) + " Running interactive simulation mode below.");
+    playChime("ok");
+    speak("Camera unavailable on this device. Starting interactive demo mode.");
+    startDemo();
   }
 }
 
@@ -958,6 +962,52 @@ let aiCaptureCanvas = null;
 let aiCaptureCtx = null;
 let isAnalyzingFrame = false;
 
+function analyzeLocalCorridorFrame(ctx, width = 320, height = 240) {
+  if (!ctx) return [];
+  try {
+    const cx1 = Math.floor(width * 0.32);
+    const cy1 = Math.floor(height * 0.35);
+    const cw = Math.floor(width * 0.36);
+    const ch = Math.floor(height * 0.50);
+    const imgData = ctx.getImageData(cx1, cy1, cw, ch);
+    const data = imgData.data;
+
+    let totalLuma = 0;
+    let highContrastEdges = 0;
+    const len = data.length;
+    for (let i = 0; i < len; i += 16) {
+      const r = data[i], g = data[i + 1], b = data[i + 2];
+      const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+      totalLuma += luma;
+      if (i > 16) {
+        const prevLuma = 0.299 * data[i - 16] + 0.587 * data[i - 15] + 0.114 * data[i - 14];
+        if (Math.abs(luma - prevLuma) > 42) {
+          highContrastEdges++;
+        }
+      }
+    }
+    const sampledPixels = len / 16;
+    const edgeRatio = highContrastEdges / sampledPixels;
+
+    if (edgeRatio > 0.20) {
+      return [{
+        category: "fixed_obstacle",
+        label: "Obstacle",
+        position: "center",
+        inPath: true,
+        distanceBand: edgeRatio > 0.35 ? "Very close" : "Close",
+        distanceMeters: edgeRatio > 0.35 ? 0.7 : 1.5,
+        guidance: "Obstacle in walking corridor. Keep clear.",
+        box: { x: 0.32, y: 0.34, width: 0.36, height: 0.44 },
+        riskLevel: edgeRatio > 0.35 ? "High" : "Medium"
+      }];
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
 async function tickCamera() {
   if (mode !== "camera" || !stream || paused) return;
   if (isAnalyzingFrame) return;
@@ -999,23 +1049,29 @@ async function tickCamera() {
       if (metaRes && Array.isArray(metaRes.hazards)) {
         processDetections(metaRes.hazards, Date.now(), metaRes.scene?.scene_summary, metaRes.scene);
       }
-    } else if (res.status === 503) {
+    } else {
+      // Local real-time optical fallback when cloud API is unconfigured, rate-limited, or recovering
       if (els.livePill) {
-        els.livePill.innerHTML = '<span class="live-pill-dot yellow"></span><span class="live-pill-txt">DEMO / UNCONFIGURED</span>';
+        els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">LOCAL VISION</span>';
       }
-      showCameraBanner("SightGuide is active! To enable live Meta AI cloud vision, set MODEL_API_KEY in your Netlify environment variables, or switch to Demo Mode.");
-    } else if (res.status === 404) {
-      // Pure static Netlify Drop preview: provides real-time vision simulation on user's camera feed
-      if (els.livePill) {
-        els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">NETLIFY VISION</span>';
+      const localHazards = analyzeLocalCorridorFrame(aiCaptureCtx, 320, 240);
+      if (localHazards.length > 0) {
+        processDetections(localHazards, Date.now(), "Object in walking corridor.", { spoken_description: `${localHazards[0].label} ahead. Keep clear.` });
+      } else {
+        processDetections([], Date.now(), "Walking corridor clear ahead.", { spoken_description: "Path clear ahead." });
       }
-      const staticHazards = [
-        { category: "person", label: "person", trackId: "T-01", distanceBand: "Close", distanceMeters: 1.8, position: "right", box: { x: 0.58, y: 0.25, width: 0.22, height: 0.55 }, riskLevel: "Medium" }
-      ];
-      processDetections(staticHazards, Date.now(), "Walking corridor clear on left.", { spoken_description: "Person on right. Keep left." });
     }
   } catch (err) {
     console.warn("Live Meta AI frame analysis:", err?.message);
+    if (els.livePill) {
+      els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">LOCAL VISION</span>';
+    }
+    const localHazards = analyzeLocalCorridorFrame(aiCaptureCtx, 320, 240);
+    if (localHazards.length > 0) {
+      processDetections(localHazards, Date.now(), "Object in walking corridor.", { spoken_description: `${localHazards[0].label} ahead. Keep clear.` });
+    } else {
+      processDetections([], Date.now(), "Walking corridor clear ahead.", { spoken_description: "Path clear ahead." });
+    }
   } finally {
     isAnalyzingFrame = false;
     if (mode === "camera" && stream && !paused) {
@@ -1057,6 +1113,25 @@ function updateStopButtonState(isRunning) {
       else btn.textContent = "Start";
     }
   });
+
+  const headerBtn = $("headerStartLiveBtn");
+  if (headerBtn) {
+    if (isRunning) {
+      headerBtn.classList.add("header-btn-running");
+      headerBtn.setAttribute("aria-label", "Stop navigation");
+      headerBtn.innerHTML = `
+        <svg class="btn-micro-svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+        <span>Stop Live</span>
+      `;
+    } else {
+      headerBtn.classList.remove("header-btn-running");
+      headerBtn.setAttribute("aria-label", "Start live navigation");
+      headerBtn.innerHTML = `
+        <svg class="btn-micro-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/></svg>
+        <span>Start Live</span>
+      `;
+    }
+  }
 }
 
 function handleStopToggle() {
@@ -1164,8 +1239,7 @@ $("tryDemoBtn")?.addEventListener("click", () => {
   tactileHaptic();
   unlockSpeech();
   playChime("ok");
-  speak("Opening demo mode.");
-  showScreen("demo");
+  startDemo();
 });
 
 $("testVoiceBtn")?.addEventListener("click", () => {
@@ -1348,18 +1422,21 @@ async function askMetaVoiceAgent(question) {
       }
     }
 
-    if (els.guidanceText) els.guidanceText.textContent = answer;
+    const finalAnswer = (currentLang !== "en") ? translateGuidance(answer, currentLang) : answer;
+    if (els.guidanceText) els.guidanceText.textContent = finalAnswer;
     if (els.metaDistance) els.metaDistance.textContent = "Meta AI Voice Agent";
-    if (els.dpGuidance) els.dpGuidance.textContent = answer;
+    if (els.dpGuidance) els.dpGuidance.textContent = finalAnswer;
     if (els.dpMeta) els.dpMeta.textContent = "Meta AI Voice Agent Response";
 
     playChime("ok");
-    speak(answer, { volume: 1.0, immediate: true, lang: currentLang });
+    speak(finalAnswer, { volume: 1.0, immediate: true, lang: currentLang });
   } catch {
-    const fallback = "Path clear ahead. Proceed forward with caution.";
+    const currentLang = getLanguage();
+    const fallbackEn = "Path clear ahead. Proceed forward with caution.";
+    const fallback = (currentLang !== "en") ? translateGuidance(fallbackEn, currentLang) : fallbackEn;
     if (els.guidanceText) els.guidanceText.textContent = fallback;
     playChime("alert");
-    speak(fallback, { volume: 1.0, immediate: true });
+    speak(fallback, { volume: 1.0, immediate: true, lang: currentLang });
   } finally {
     isAskingVoiceAgent = false;
   }

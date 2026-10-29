@@ -1,5 +1,5 @@
-// SightGuide PWA Service Worker v1.0
-const CACHE_NAME = "sightguide-shell-v1";
+// SightGuide PWA Service Worker v3.7
+const CACHE_NAME = "sightguide-shell-v3.7";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -9,6 +9,8 @@ const SHELL_ASSETS = [
   "./assets/sightguide_brandmark.svg",
   "./assets/safety_art.svg",
   "./assets/meta_logo.svg",
+  "./assets/hero_walking.jpg",
+  "./assets/live_scene_pedestrian.jpg",
   "./assets/thumb_person.svg",
   "./assets/thumb_steps.svg",
   "./assets/thumb_side.svg",
@@ -49,25 +51,24 @@ self.addEventListener("activate", (evt) => {
 self.addEventListener("fetch", (evt) => {
   const url = new URL(evt.request.url);
 
-  // Network-first for API endpoints and live cloud services
+  // Network-only for API endpoints and live cloud services
   if (url.pathname.startsWith("/api/") || url.searchParams.has("api")) {
     return;
   }
 
-  // Cache-first, fallback to network for static UI shell assets
+  // Network-first with cache fallback: guarantees users always receive the newest code
   evt.respondWith(
-    caches.match(evt.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(evt.request).then((response) => {
-        if (!response || response.status !== 200 || response.type !== "basic") {
-          return response;
-        }
+    fetch(evt.request).then((response) => {
+      if (response && response.status === 200) {
         const toCache = response.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(evt.request, toCache);
         });
-        return response;
-      }).catch(() => {
+      }
+      return response;
+    }).catch(() => {
+      return caches.match(evt.request).then((cached) => {
+        if (cached) return cached;
         if (evt.request.destination === "document") {
           return caches.match("./index.html");
         }
@@ -75,4 +76,3 @@ self.addEventListener("fetch", (evt) => {
     })
   );
 });
-
