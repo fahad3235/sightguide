@@ -970,21 +970,35 @@ async function tickCamera() {
 }
 
 function updateStopButtonState(isRunning) {
-  const stopButtons = document.querySelectorAll(".btn-stop-main, #stopBtn, #dpStop");
+  const stopButtons = document.querySelectorAll(".btn-stop-main, #stopBtn, #stopBtnExpanded, #dpStop");
   stopButtons.forEach((btn) => {
+    if (btn.id === "dpStop") {
+      if (isRunning) {
+        btn.classList.remove("dp-btn-start");
+        btn.classList.add("dp-btn-stop");
+        btn.textContent = "Stop";
+        btn.setAttribute("aria-label", "Stop navigation");
+      } else {
+        btn.classList.add("dp-btn-start");
+        btn.classList.remove("dp-btn-stop");
+        btn.textContent = "Start Live";
+        btn.setAttribute("aria-label", "Start live navigation");
+      }
+      return;
+    }
     const iconDiv = btn.querySelector(".stop-icon-square, .stop-icon, .play-icon-triangle");
-    const labelSpan = btn.querySelector(".stop-label") || btn;
+    const labelSpan = btn.querySelector(".stop-label");
     if (isRunning) {
       btn.classList.remove("btn-start-state");
       btn.setAttribute("aria-label", "Stop navigation");
       if (iconDiv) iconDiv.className = "stop-icon-square";
-      if (labelSpan && labelSpan !== btn) labelSpan.textContent = "Stop";
+      if (labelSpan) labelSpan.textContent = "Stop";
       else btn.textContent = "Stop";
     } else {
       btn.classList.add("btn-start-state");
       btn.setAttribute("aria-label", "Start navigation");
       if (iconDiv) iconDiv.className = "stop-icon play-icon-triangle";
-      if (labelSpan && labelSpan !== btn) labelSpan.textContent = "Start";
+      if (labelSpan) labelSpan.textContent = "Start";
       else btn.textContent = "Start";
     }
   });
@@ -1029,22 +1043,34 @@ function stopAll() {
   resetSession();
   updateStopButtonState(false);
   if (els.livePill) {
-    els.livePill.innerHTML = '<span class="live-pill-dot gray"></span><span class="live-pill-txt">STOPPED</span>';
+    els.livePill.innerHTML = '<span class="live-pill-dot gray"></span><span class="live-pill-txt">STANDBY</span>';
   }
   if (els.guidanceText) {
-    els.guidanceText.textContent = "Navigation stopped. Tap Start to resume.";
+    els.guidanceText.textContent = "SightGuide is in standby. Tap Start Live or Demo Mode.";
   }
   if (els.dpGuidance) {
-    els.dpGuidance.textContent = "Navigation stopped. Tap Start to resume.";
+    els.dpGuidance.textContent = "SightGuide is in standby.";
   }
   if (els.metaDistance) {
-    els.metaDistance.textContent = "Idle";
+    els.metaDistance.textContent = "Standby";
   }
   if (els.dpMeta) {
-    els.dpMeta.textContent = "Idle";
+    els.dpMeta.textContent = "Tap Start Live or Demo Mode to begin";
   }
   if (els.chipRow) {
-    els.chipRow.innerHTML = '<span class="obj-chip"><span>Idle</span></span><span class="obj-chip">Stopped</span>';
+    els.chipRow.innerHTML = '<span class="obj-chip obj-chip-standby"><span class="chip-standby-dot"></span><span>Sensors Ready</span></span><span class="obj-chip obj-chip-active"><span class="chip-live-dot"></span> Online</span>';
+  }
+  if (els.dpRisk) {
+    els.dpRisk.innerHTML = `
+      <li class="dp-risk-item dp-risk-standby">
+        <div class="dp-item-left">
+          <span class="dp-item-icon green" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </span>
+          <span>Spatial Radar <small>Standby</small></span>
+        </div>
+        <span class="dp-item-chip green">Online</span>
+      </li>`;
   }
   renderCurrentFrame();
 }
@@ -1112,10 +1138,14 @@ $("startCameraBtn")?.addEventListener("click", () => {
 
 $("stopCameraBtn")?.addEventListener("click", handleStopToggle);
 $("stopBtn")?.addEventListener("click", handleStopToggle);
+$("stopBtnExpanded")?.addEventListener("click", handleStopToggle);
 $("dpStop")?.addEventListener("click", handleStopToggle);
 document.querySelectorAll(".btn-stop-main").forEach((b) => {
   b.addEventListener("click", handleStopToggle);
 });
+
+// Initialize buttons to ready/start state
+updateStopButtonState(false);
 
 $("startDemoBtn")?.addEventListener("click", () => { unlockSpeech(); startDemo(); });
 $("startDemoBtn2")?.addEventListener("click", () => { unlockSpeech(); startDemo(); });

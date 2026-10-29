@@ -89,10 +89,10 @@
 
 
           <div class="welcome-hero">
-            <img src="assets/hero_walking.jpg" onerror="this.onerror=null; this.src='assets/safety_art.svg';" alt="A young man with backpack walking forward along a sunny city street using a white cane" class="hero-art-photo">
+            <img src="assets/hero_walking.jpg" onerror="this.onerror=null; this.src='assets/safety_art.svg';" alt="SightGuide assistive spatial navigation for blind and low vision individuals" class="hero-art-photo" loading="eager">
             
             <div class="hero-brand-mark">
-              <img src="assets/sightguide_brandmark.svg" alt="SightGuide" class="hero-app-logo" width="72" height="72">
+              <img src="assets/sightguide_brandmark.svg" onerror="this.style.display='none'" alt="SightGuide" class="hero-app-logo" width="72" height="72">
             </div>
             
             <h1 class="brand">Sight<span>Guide</span></h1>
@@ -205,8 +205,8 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
             </button>
             <div class="guidance-content">
-              <h2 class="guidance-heading" id="guidanceText" tabindex="-1">Person on your right, keep left.</h2>
-              <span class="guidance-pill-sub" id="metaDistance">Close, 1 to 3 m</span>
+              <h2 class="guidance-heading" id="guidanceText" tabindex="-1">SightGuide is ready. Tap Start Live or Demo Mode.</h2>
+              <span class="guidance-pill-sub" id="metaDistance">Standby</span>
             </div>
             <button class="voice-agent-btn" id="voiceAgentBtn" type="button" aria-label="Speak to Meta AI Voice Agent" title="Tap to talk to AI">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -232,15 +232,13 @@
 
           <!-- Active Track Chip Row -->
           <div class="active-chip-row" id="chipRow" aria-label="Active object tracking">
-            <span class="obj-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/></svg>
-              <span>Person #03</span>
+            <span class="obj-chip obj-chip-standby">
+              <span class="chip-standby-dot"></span>
+              <span>Sensors Ready</span>
             </span>
-            <span class="obj-chip-arrow">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            <span class="obj-chip obj-chip-active">
+              <span class="chip-live-dot"></span> Online
             </span>
-            <span class="obj-chip">Moving</span>
-            <span class="obj-chip obj-chip-active"><span class="chip-live-dot"></span> Active</span>
           </div>
 
           <!-- Live Bottom Actions: Demo Mode, Big Stop Button, Settings -->
@@ -249,9 +247,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               <span>Demo Mode</span>
             </button>
-            <button class="btn-stop-main" id="stopBtn" type="button" aria-label="Stop navigation">
-              <div class="stop-icon-square"></div>
-              <span class="stop-label">Stop</span>
+            <button class="btn-stop-main btn-start-state" id="stopBtn" type="button" aria-label="Start navigation">
+              <div class="stop-icon play-icon-triangle"></div>
+              <span class="stop-label">Start</span>
             </button>
             <button class="action-nav-item" data-nav="settings" type="button">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -611,9 +609,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               <span>Demo Mode</span>
             </button>
-            <button class="btn-stop-main" id="stopBtnExpanded" type="button" aria-label="Stop navigation">
-              <div class="stop-icon-square"></div>
-              <span class="stop-label">Stop</span>
+            <button class="btn-stop-main btn-start-state" id="stopBtnExpanded" type="button" aria-label="Start navigation">
+              <div class="stop-icon play-icon-triangle"></div>
+              <span class="stop-label">Start</span>
             </button>
             <button class="action-nav-item" data-nav="settings" type="button">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -827,45 +825,27 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
           </div>
           <div>
-            <p class="dp-guidance-text" id="dpGuidance">Person on your right, keep left.</p>
-            <div class="dp-guidance-sub" id="dpMeta">Close, 1 to 3 m</div>
+            <p class="dp-guidance-text" id="dpGuidance">SightGuide is in standby.</p>
+            <div class="dp-guidance-sub" id="dpMeta">Tap Start Live or Demo Mode to begin</div>
           </div>
         </div>
 
         <h2>Detected Objects</h2>
         <ul class="dp-risk-list" id="dpRisk">
-          <li class="dp-risk-item">
+          <li class="dp-risk-item dp-risk-standby">
             <div class="dp-item-left">
-              <span class="dp-item-icon red" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><path d="M12 8v8m-4-5l4 2 4-2m-4 5l-2 6m2-6l2 6"/></svg>
+              <span class="dp-item-icon green" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </span>
-              <span>Person <small>ID: 03</small></span>
+              <span>Spatial Radar <small>Standby</small></span>
             </div>
-            <span class="dp-item-chip red">1 to 3 m</span>
-          </li>
-          <li class="dp-risk-item">
-            <div class="dp-item-left">
-              <span class="dp-item-icon yellow" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16"/></svg>
-              </span>
-              <span>Pole <small>ID: 07</small></span>
-            </div>
-            <span class="dp-item-chip yellow">&gt; 3 m</span>
-          </li>
-          <li class="dp-risk-item">
-            <div class="dp-item-left">
-              <span class="dp-item-icon blue" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 4 20 8 16 8 16 12 12 12 12 16 8 16 8 20 4 20"/></svg>
-              </span>
-              <span>Step <small>ID: 12</small></span>
-            </div>
-            <span class="dp-item-chip blue">1 to 3 m</span>
+            <span class="dp-item-chip green">Online</span>
           </li>
         </ul>
 
         <div class="dp-actions">
           <button class="dp-btn" data-nav="demo" type="button">Demo Mode</button>
-          <button class="dp-btn dp-btn-stop" id="dpStop" type="button">Stop</button>
+          <button class="dp-btn dp-btn-start" id="dpStop" type="button">Start Live</button>
           <button class="dp-btn" data-nav="settings" type="button">Settings</button>
         </div>
 
