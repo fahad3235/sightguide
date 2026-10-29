@@ -12,6 +12,7 @@ const MIME = {
   ".css": "text/css",
   ".js": "text/javascript",
   ".json": "application/json",
+  ".webmanifest": "application/manifest+json",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".png": "image/png",

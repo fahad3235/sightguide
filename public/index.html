@@ -8,6 +8,11 @@
   <title>SightGuide: Spatial Vision &amp; Audio Navigation</title>
   <link rel="icon" type="image/svg+xml" href="assets/sightguide_brandmark.svg">
   <link rel="apple-touch-icon" href="assets/sightguide_brandmark.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SightGuide">
   <link rel="stylesheet" href="styles.css?v=3.6">
 </head>
 <body class="desktop-view-active">
@@ -57,6 +62,10 @@
         <span class="header-status-dot"></span>
         <span class="header-status-txt">Meta AI Active</span>
       </div>
+      <button class="header-action-btn" id="installPwaBtn" type="button" style="display: none;" title="Install SightGuide App">
+        <svg class="btn-micro-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Install App</span>
+      </button>
       <button class="header-action-btn" id="headerTestVoiceBtn" type="button">
         <svg class="btn-micro-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
         <span>Test Voice</span>
@@ -169,10 +178,15 @@
             </button>
           </div>
 
-          <!-- Video / Canvas Live Viewport -->
-          <div class="viewport-container">
+          <!-- Video / Canvas Live Viewport with Accessible Touch Gestures -->
+          <div class="viewport-container" id="liveViewportContainer" role="region" aria-label="Interactive camera viewport. Tap once to speak guidance. Double-tap to ask voice assistant. Long press to pause." tabindex="0">
             <video id="liveVideo" autoplay playsinline webkit-playsinline muted poster="assets/live_scene_pedestrian.jpg"></video>
             <canvas id="sampleCanvas" width="640" height="440"></canvas>
+            <div class="gesture-hint-bar" aria-hidden="true">
+              <span class="gesture-pill">1-Tap: Status</span>
+              <span class="gesture-pill">2-Tap: Voice AI</span>
+              <span class="gesture-pill">Hold: Pause</span>
+            </div>
           </div>
 
           <!-- Camera status / blocked-reason banner (hidden unless camera fails) -->
@@ -204,12 +218,17 @@
             </button>
           </div>
 
-          <!-- One-Tap Voice Assistant Questions -->
+          <!-- One-Tap Voice Assistant Questions & Everyday Assistance Modes -->
           <div class="voice-chip-row" role="region" aria-label="Voice Agent Inquiries">
             <button class="voice-chip" type="button" data-prompt="What is in front of me?">What&rsquo;s ahead?</button>
             <button class="voice-chip" type="button" data-prompt="Describe the full scene in detail.">Describe scene</button>
             <button class="voice-chip" type="button" data-prompt="Is my walking path clear of obstacles?">Is path clear?</button>
+            <button class="voice-chip special-chip" type="button" data-prompt="Identify any paper currency, banknote, or money in front of the camera and say its exact denomination and currency.">💵 Read Currency</button>
+            <button class="voice-chip special-chip" type="button" data-prompt="Read all storefront signs, street signs, labels, or door numbers visible in front of the camera clearly.">🏷️ Read Signs &amp; Text</button>
           </div>
+
+          <!-- ARIA Live Region for Screen Readers -->
+          <div id="ariaLiveRegion" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
           <!-- Active Track Chip Row -->
           <div class="active-chip-row" id="chipRow" aria-label="Active object tracking">
@@ -369,8 +388,15 @@
             <span class="setting-row-ic" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
             </span>
-            <div class="setting-row-main">Tactile Haptics<small>Vibrates phone for hazard collision alerts</small></div>
+            <div class="setting-row-main">Multi-Pattern Haptics<small>Differentiated vibration pulses by hazard distance</small></div>
             <button class="toggle-switch switch-on" id="hapticToggle" type="button" role="switch" aria-checked="true" aria-label="Toggle tactile haptics"></button>
+          </div>
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
+            <div class="setting-row-main">Adaptive Battery Saver<small>Slows camera sampling down when stationary</small></div>
+            <button class="toggle-switch switch-on" id="motionAdaptiveToggle" type="button" role="switch" aria-checked="true" aria-label="Toggle motion adaptive sampling"></button>
           </div>
 
           <h3 class="settings-section-title">Speech Cadence</h3>

@@ -1,0 +1,20 @@
+{
+  "name": "SightGuide: Spatial Vision & Audio Navigation",
+  "short_name": "SightGuide",
+  "description": "Real-time AI spatial vision and audio navigation for blind and visually impaired individuals.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07152b",
+  "theme_color": "#2563eb",
+  "categories": ["accessibility", "utilities", "navigation"],
+  "icons": [
+    {
+      "src": "assets/sightguide_brandmark.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

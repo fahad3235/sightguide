@@ -1164,6 +1164,54 @@ h1, h2, h3, h4, .desktop-panel h2, .screen-head h2, .board-header h2 {
   transform: translateY(1px);
 }
 
+.voice-chip.special-chip {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(16, 185, 129, 0.15));
+  border-color: rgba(37, 99, 235, 0.35);
+  color: var(--blue, #2563eb);
+  font-weight: 700;
+}
+.voice-chip.special-chip:hover {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.22), rgba(16, 185, 129, 0.25));
+  border-color: var(--blue, #2563eb);
+}
+
+.gesture-hint-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.gesture-pill {
+  background: rgba(7, 21, 43, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  letter-spacing: 0.02em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .guidance-content {
   flex: 1;
 }

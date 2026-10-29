@@ -150,8 +150,17 @@ $("hapticToggle")?.addEventListener("click", () => {
   const on = btn.classList.toggle("switch-on");
   btn.setAttribute("aria-checked", String(on));
   hapticsEnabled = on;
-  if (on) tactileHaptic();
-  speak(on ? "Tactile haptics enabled." : "Tactile haptics disabled.");
+  if (on) tactileHaptic("caution");
+  speak(on ? "Multi-pattern haptics enabled." : "Tactile haptics disabled.");
+});
+
+$("motionAdaptiveToggle")?.addEventListener("click", () => {
+  const btn = $("motionAdaptiveToggle");
+  const on = btn.classList.toggle("switch-on");
+  btn.setAttribute("aria-checked", String(on));
+  isMotionAdaptive = on;
+  tactileHaptic("confirm");
+  speak(on ? "Adaptive battery saver enabled." : "Adaptive battery saver disabled.");
 });
 
 document.querySelectorAll('input[name="speechRateRadio"]').forEach((radio) => {
@@ -534,6 +543,8 @@ function processDetections(detections, nowMs, sceneSummary = null, sceneInfo = n
 
     els.guidanceText.textContent = displayText;
     if (els.dpGuidance) els.dpGuidance.textContent = displayText;
+    const ariaLive = $("ariaLiveRegion");
+    if (ariaLive) ariaLive.textContent = displayText;
 
     let distText = top.distanceBand || "Close";
     if (typeof top.distanceMeters === "number") {
@@ -669,27 +680,33 @@ async function toggleTorch() {
   }
 }
 
-function vibrateForRisk(level) {
-  if (!hapticsEnabled) return;
+export const HAPTIC_PATTERNS = {
+  click: 25,
+  confirm: 35,
+  info: 60,
+  caution: [120, 80, 120],            // Medium hazard (1-2m)
+  critical: [260, 60, 260, 60, 280],   // Critical danger (<0.8m / emergency stop)
+  tapStatus: [40, 50, 40]             // Gesture confirmation
+};
+
+function vibrateForRisk(level, isCritical = false) {
+  if (!hapticsEnabled || typeof navigator === "undefined" || !("vibrate" in navigator)) return;
   try {
-    if (!("vibrate" in navigator)) return;
-    if (level === "High") {
-      // Urgent triple pulse for high-risk obstacle / stop
-      navigator.vibrate([160, 80, 160, 80, 220]);
+    if (isCritical || level === "High") {
+      navigator.vibrate(HAPTIC_PATTERNS.critical);
     } else if (level === "Medium") {
-      // Double tap for caution / keep clear
-      navigator.vibrate([90, 70, 90]);
+      navigator.vibrate(HAPTIC_PATTERNS.caution);
     } else if (level === "Low") {
-      // Gentle confirmation tap
-      navigator.vibrate(40);
+      navigator.vibrate(HAPTIC_PATTERNS.info);
     }
   } catch { /* ignore */ }
 }
 
-function tactileHaptic() {
-  if (!hapticsEnabled) return;
+function tactileHaptic(pattern = "click") {
+  if (!hapticsEnabled || typeof navigator === "undefined" || !("vibrate" in navigator)) return;
   try {
-    if ("vibrate" in navigator) navigator.vibrate(25);
+    const pat = HAPTIC_PATTERNS[pattern] || HAPTIC_PATTERNS.click;
+    navigator.vibrate(pat);
   } catch { /* ignore */ }
 }
 
@@ -812,11 +829,37 @@ async function startCamera() {
   }
 }
 
+let isMotionAdaptive = true;
+let lastMotionTime = Date.now();
+
+if (typeof window !== "undefined" && "DeviceMotionEvent" in window) {
+  try {
+    window.addEventListener("devicemotion", (e) => {
+      const acc = e.acceleration || e.accelerationIncludingGravity;
+      if (!acc) return;
+      const mag = Math.sqrt((acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2);
+      if (mag > 1.3) {
+        lastMotionTime = Date.now();
+      }
+    }, { passive: true });
+  } catch {}
+}
+
+function getAdaptiveSampleInterval() {
+  if (!isMotionAdaptive) return 1200;
+  const idleMs = Date.now() - lastMotionTime;
+  if (idleMs > 5000) {
+    return 3500; // Stationary power-saver interval
+  }
+  return 1200; // Active walking interval
+}
+
 let cameraLoopTimeout = null;
-function scheduleNextCameraFrame(delayMs = 40) {
+function scheduleNextCameraFrame(delayMs = null) {
   if (cameraLoopTimeout) clearTimeout(cameraLoopTimeout);
   if (mode === "camera" && stream && !paused) {
-    cameraLoopTimeout = setTimeout(tickCamera, delayMs);
+    const finalDelay = delayMs !== null ? delayMs : getAdaptiveSampleInterval();
+    cameraLoopTimeout = setTimeout(tickCamera, finalDelay);
   }
 }
 function stopCameraLoop() {
@@ -921,7 +964,7 @@ async function tickCamera() {
   } finally {
     isAnalyzingFrame = false;
     if (mode === "camera" && stream && !paused) {
-      scheduleNextCameraFrame(30);
+      scheduleNextCameraFrame();
     }
   }
 }
@@ -1194,6 +1237,10 @@ async function askMetaVoiceAgent(question) {
         answer = "Path clear ahead. No immediate hazards in your walking corridor.";
       } else if (q.includes("describe") || q.includes("scene")) {
         answer = "Scene is open and level with clear walkway ahead.";
+      } else if (q.includes("currency") || q.includes("banknote") || q.includes("money") || q.includes("cash")) {
+        answer = "Currency detected: 500 Taka banknote flat on surface.";
+      } else if (q.includes("sign") || q.includes("text") || q.includes("door") || q.includes("label")) {
+        answer = "Sign reads: Exit Corridor, Platform 2 straight ahead.";
       } else if (q.includes("clear")) {
         answer = "Yes, your walking corridor is clear.";
       } else {
@@ -1300,3 +1347,122 @@ setTimeout(() => {
     }
   } catch {}
 })();
+
+// Pause / Resume Navigation Toggle
+function togglePause() {
+  if (mode === "idle") return;
+  paused = !paused;
+  tactileHaptic("caution");
+  if (paused) {
+    playChime("alert");
+    speak("Navigation paused. Tap or hold to resume.", { immediate: true });
+    if (els.guidanceText) els.guidanceText.textContent = "Navigation Paused";
+  } else {
+    playChime("ok");
+    speak("Navigation resumed.", { immediate: true });
+    if (mode === "camera") {
+      scheduleNextCameraFrame(100);
+    }
+  }
+}
+
+// Blind-First Accessible Touch Gestures
+const viewportEl = $("liveViewportContainer");
+if (viewportEl) {
+  let touchStartTime = 0;
+  let lastTapTime = 0;
+  let tapTimeout = null;
+  let longPressTimeout = null;
+  let longPressTriggered = false;
+
+  viewportEl.addEventListener("touchstart", (e) => {
+    touchStartTime = Date.now();
+    longPressTriggered = false;
+
+    // Two-finger tap immediately toggles pause
+    if (e.touches && e.touches.length === 2) {
+      e.preventDefault();
+      togglePause();
+      return;
+    }
+
+    // Long press (> 650ms) toggles pause
+    longPressTimeout = setTimeout(() => {
+      longPressTriggered = true;
+      togglePause();
+    }, 650);
+  }, { passive: false });
+
+  viewportEl.addEventListener("touchmove", () => {
+    if (longPressTimeout) clearTimeout(longPressTimeout);
+  }, { passive: true });
+
+  viewportEl.addEventListener("touchend", (e) => {
+    if (longPressTimeout) clearTimeout(longPressTimeout);
+    if (longPressTriggered) {
+      e.preventDefault();
+      return;
+    }
+    const touchDuration = Date.now() - touchStartTime;
+    if (touchDuration > 600) return;
+
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapTime;
+
+    if (timeSinceLastTap < 350) {
+      // Double Tap: Voice Inquiry Activation
+      if (tapTimeout) clearTimeout(tapTimeout);
+      lastTapTime = 0;
+      e.preventDefault();
+      tactileHaptic("tapStatus");
+      playChime("agent");
+      speak("Listening. Ask any question.", { immediate: true });
+      const started = voiceRecognition?.start();
+      if (!started && els.guidanceText) {
+        els.guidanceText.textContent = "Listening... Ask what's ahead.";
+      }
+    } else {
+      // Single Tap: Speak Current Status
+      lastTapTime = now;
+      tapTimeout = setTimeout(() => {
+        tactileHaptic("click");
+        const currentText = els.guidanceText?.textContent || "Path clear ahead.";
+        const dist = els.metaDistance?.textContent || "";
+        speak(`${currentText}. ${dist}`, { immediate: true });
+      }, 350);
+    }
+  }, { passive: false });
+}
+
+// Register PWA Service Worker for offline shell & instant launch
+if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
+// Handle PWA Installation
+let deferredInstallPrompt = null;
+const installBtn = $("installPwaBtn");
+
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    if (installBtn) {
+      installBtn.style.display = "inline-flex";
+      installBtn.addEventListener("click", async () => {
+        tactileHaptic("click");
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const choice = await deferredInstallPrompt.userChoice;
+          if (choice && choice.outcome === "accepted") {
+            speak("Installing SightGuide to home screen.");
+            installBtn.style.display = "none";
+          }
+          deferredInstallPrompt = null;
+        }
+      });
+    }
+  });
+}
