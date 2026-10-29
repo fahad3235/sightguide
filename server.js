@@ -22,7 +22,12 @@ const MIME = {
 const ttsCache = new Map();
 
 function sendJson(res, status, obj) {
-  res.writeHead(status, { "Content-Type": "application/json" });
+  res.writeHead(status, {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+  });
   res.end(JSON.stringify(obj));
 }
 function readBody(req, limit) {
@@ -38,6 +43,14 @@ function readBody(req, limit) {
 export function createServer() {
   return http.createServer(async (req, res) => {
     try {
+      if (req.method === "OPTIONS") {
+        res.writeHead(204, {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+        });
+        return res.end();
+      }
       const pathname = req.url ? req.url.split("?")[0] : "/";
       if (req.method === "GET" && pathname === "/api/health") {
         // Never return the key or secret environment contents.

@@ -748,6 +748,19 @@ function stopCameraLoop() {
   }
 }
 
+export function getApiUrl(endpoint) {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const queryBase = params.get("api");
+    const storedBase = localStorage.getItem("sightguide_api_base");
+    const base = (queryBase || storedBase || "").trim().replace(/\/+$/, "");
+    if (queryBase) localStorage.setItem("sightguide_api_base", queryBase);
+    return base ? `${base}${endpoint}` : endpoint;
+  } catch {
+    return endpoint;
+  }
+}
+
 let aiCaptureCanvas = null;
 let aiCaptureCtx = null;
 let isAnalyzingFrame = false;
@@ -780,7 +793,7 @@ async function tickCamera() {
   isAnalyzingFrame = true;
 
   try {
-    const res = await fetch("/api/analyze-frame", {
+    const res = await fetch(getApiUrl("/api/analyze-frame"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: dataUrl, sequence: seq })
@@ -1031,7 +1044,7 @@ async function askMetaVoiceAgent(question) {
   }
 
   try {
-    const res = await fetch("/api/voice-agent", {
+    const res = await fetch(getApiUrl("/api/voice-agent"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question, image: imageData })
