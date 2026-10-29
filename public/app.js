@@ -204,7 +204,9 @@ function fmtTime(ms) {
 
 function getCategorySvg(category) {
   const cat = (category || "").toLowerCase();
-  if (cat.includes("person") || cat.includes("pedestrian")) {
+  if (cat.includes("dishware") || cat.includes("cup") || cat.includes("mug") || cat.includes("bottle") || cat.includes("plate") || cat.includes("drink")) {
+    return `<svg class="dp-svg-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M5 8h12v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`;
+  } else if (cat.includes("person") || cat.includes("pedestrian")) {
     return `<svg class="dp-svg-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/></svg>`;
   } else if (cat.includes("vehicle") || cat.includes("car")) {
     return `<svg class="dp-svg-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="7" rx="2"/><circle cx="7.5" cy="18" r="2.5"/><circle cx="16.5" cy="18" r="2.5"/><path d="M5 11l2-5h10l2 5"/></svg>`;
@@ -342,9 +344,17 @@ function renderCurrentFrame() {
 
   for (const canvas of [canvas1, canvas2]) {
     if (!canvas) continue;
+    // Keep canvas drawing buffer 1:1 with visible display size to avoid any scaling or cropping
+    if (canvas.clientWidth && canvas.clientHeight) {
+      if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+      }
+    }
     if (mode === "camera") {
       drawCameraFrame(canvas);
-      drawMaskOverlay(canvas, currentRankedTracks, "META AI · REAL-TIME VISION", overlay);
+      // Clean display without redundant overlapping header badge
+      drawMaskOverlay(canvas, currentRankedTracks, "", overlay);
     } else if (mode === "demo") {
       const demoTracks = currentRankedTracks.length ? currentRankedTracks : defaultMockTracks;
       drawDemoScene(canvas, demoTracks, frameCount, activeScenarioId);
@@ -809,16 +819,15 @@ async function tickCamera() {
   frameCount += 1;
   const seq = frameCount;
 
-  // Optimized 400x300 canvas: ultra-fast transmission and rapid analysis for blind navigation
+  // Optimized 320x240 canvas: fast upload and rapid analysis for real-time blind navigation
   if (!aiCaptureCanvas) {
     aiCaptureCanvas = document.createElement("canvas");
-    aiCaptureCanvas.width = 400;
-    aiCaptureCanvas.height = 300;
     aiCaptureCtx = aiCaptureCanvas.getContext("2d");
   }
-
-  aiCaptureCtx.drawImage(video, 0, 0, 400, 300);
-  const dataUrl = aiCaptureCanvas.toDataURL("image/jpeg", 0.55);
+  aiCaptureCanvas.width = 320;
+  aiCaptureCanvas.height = 240;
+  aiCaptureCtx.drawImage(video, 0, 0, 320, 240);
+  const dataUrl = aiCaptureCanvas.toDataURL("image/jpeg", 0.45);
 
   isAnalyzingFrame = true;
 
@@ -1099,17 +1108,17 @@ async function askMetaVoiceAgent(question) {
   if (v && v.readyState >= 2 && v.videoWidth > 0) {
     if (!aiCaptureCanvas) {
       aiCaptureCanvas = document.createElement("canvas");
-      aiCaptureCanvas.width = 640;
-      aiCaptureCanvas.height = 480;
       aiCaptureCtx = aiCaptureCanvas.getContext("2d");
     }
-    aiCaptureCtx.drawImage(v, 0, 0, 640, 480);
-    imageData = aiCaptureCanvas.toDataURL("image/jpeg", 0.70);
+    aiCaptureCanvas.width = 320;
+    aiCaptureCanvas.height = 240;
+    aiCaptureCtx.drawImage(v, 0, 0, 320, 240);
+    imageData = aiCaptureCanvas.toDataURL("image/jpeg", 0.50);
   } else {
     const canvas = els.sampleCanvas || els.sampleCanvasExpanded;
     if (canvas) {
       try {
-        imageData = canvas.toDataURL("image/jpeg", 0.70);
+        imageData = canvas.toDataURL("image/jpeg", 0.50);
       } catch {}
     }
   }

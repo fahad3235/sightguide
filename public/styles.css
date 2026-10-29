@@ -1021,8 +1021,16 @@ h1, h2, h3, h4, .desktop-panel h2, .screen-head h2, .board-header h2 {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
+}
+
+.viewport-container video {
+  object-fit: cover;
+}
+
+.viewport-container canvas {
+  object-fit: fill;
+  pointer-events: none;
 }
 
 /* Guidance Card */

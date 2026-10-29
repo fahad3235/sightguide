@@ -6,7 +6,8 @@
   "name": "sightguide",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "build:zip": "node build-netlify-zip.js"
   },
   "type": "module",
   "version": "2.0.0"

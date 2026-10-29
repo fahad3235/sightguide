@@ -5,6 +5,8 @@ const BOX_COLORS = {
   vehicle: "#ef4444",
   stairs: "#f59e0b",
   furniture: "#3b82f6",
+  dishware: "#10b981",
+  electronics: "#38bdf8",
   drain: "#f59e0b",
   drop: "#f59e0b",
   branch: "#f59e0b",
@@ -31,16 +33,16 @@ export function drawMaskOverlay(canvas, tracks, label, opts = {}) {
   const ctx = canvas.getContext("2d");
   const w = canvas.width, h = canvas.height;
 
-  // Top pill badge (e.g. META AI · REAL-TIME VISION)
-  if (label) {
+  // Top pill badge (only shown when explicitly provided and no tracked objects to avoid visual collision)
+  if (label && tracks.length === 0) {
     ctx.font = "bold 11px Inter, -apple-system, BlinkMacSystemFont, sans-serif";
     const badgeW = ctx.measureText(label).width + 18;
     ctx.fillStyle = "rgba(15, 31, 56, 0.85)";
     ctx.beginPath();
-    ctx.roundRect ? ctx.roundRect(10, 10, badgeW, 22, 5) : ctx.fillRect(10, 10, badgeW, 22);
+    ctx.roundRect ? ctx.roundRect(16, 16, badgeW, 22, 5) : ctx.fillRect(16, 16, badgeW, 22);
     ctx.fill();
     ctx.fillStyle = "#38bdf8";
-    ctx.fillText(label, 18, 25);
+    ctx.fillText(label, 25, 31);
   }
 
   // AR Safe Walking Corridor (Center Navigation Lane)
@@ -81,6 +83,9 @@ export function drawMaskOverlay(canvas, tracks, label, opts = {}) {
 
   for (const t of tracks) {
     if (!t.box) continue;
+    // Skip full-screen borders (when an AI model occasionally boxes the entire image frame)
+    if (t.box.width >= 0.94 && t.box.height >= 0.94) continue;
+
     const color = BOX_COLORS[t.category] || "#38bdf8";
     const x = t.box.x * w, y = t.box.y * h, bw = t.box.width * w, bh = t.box.height * h;
 
@@ -127,9 +132,12 @@ export function drawMaskOverlay(canvas, tracks, label, opts = {}) {
       const tw = metrics.width + 16;
       const th = 22;
       
-      // Clamp coordinates safely within the canvas view
-      const px = Math.max(6, Math.min(x, w - tw - 6));
-      const py = y < th + 10 ? Math.min(h - 6, y + th + 6) : y - 6;
+      // Safe padding from edges (16px) to avoid clipping on rounded phone screens
+      const px = Math.max(16, Math.min(x, w - tw - 16));
+      let py = y - 6;
+      if (py < th + 10) {
+        py = Math.min(h - 16, y + th + 6);
+      }
 
       // Rounded pill badge background
       ctx.fillStyle = color;
@@ -146,27 +154,28 @@ export function drawMaskOverlay(canvas, tracks, label, opts = {}) {
     }
   }
 
-  // Bottom tags on video/canvas view
+  // Bottom tags on video/canvas view with safe padding away from rounded edges
   // Tag 1: Tracking count (bottom left)
   const countText = `Tracking: ${tracks.length} object${tracks.length === 1 ? "" : "s"}`;
   ctx.font = "bold 12px Inter, -apple-system, BlinkMacSystemFont, sans-serif";
   const countWidth = ctx.measureText(countText).width + 16;
   ctx.fillStyle = "rgba(11, 27, 51, 0.85)";
   ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(10, h - 34, countWidth, 24, 6) : ctx.fillRect(10, h - 34, countWidth, 24);
+  ctx.roundRect ? ctx.roundRect(16, h - 38, countWidth, 24, 6) : ctx.fillRect(16, h - 38, countWidth, 24);
   ctx.fill();
   ctx.fillStyle = "#f8fafc";
-  ctx.fillText(countText, 18, h - 18);
+  ctx.fillText(countText, 24, h - 22);
 
   // Tag 2: Sampling speed (bottom right)
   const sampleText = "Sampling: 1.5s";
   const sampleWidth = ctx.measureText(sampleText).width + 16;
+  const sampleX = w - sampleWidth - 16;
   ctx.fillStyle = "rgba(11, 27, 51, 0.85)";
   ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(w - sampleWidth - 10, h - 34, sampleWidth, 24, 6) : ctx.fillRect(w - sampleWidth - 10, h - 34, sampleWidth, 24);
+  ctx.roundRect ? ctx.roundRect(sampleX, h - 38, sampleWidth, 24, 6) : ctx.fillRect(sampleX, h - 38, sampleWidth, 24);
   ctx.fill();
   ctx.fillStyle = "#cbd5e1";
-  ctx.fillText(sampleText, w - sampleWidth - 2, h - 18);
+  ctx.fillText(sampleText, sampleX + 8, h - 22);
 }
 
 export function drawDemoScene(canvas, tracks, frameNo, scenarioId = "all") {
