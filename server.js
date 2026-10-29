@@ -122,6 +122,7 @@ export function createServer() {
             "Accept-Ranges": "bytes",
             "Content-Length": chunk.length,
             "Content-Type": "audio/mpeg",
+            "Access-Control-Allow-Origin": "*",
             "Cache-Control": "public, max-age=86400"
           });
           return res.end(chunk);
@@ -131,6 +132,7 @@ export function createServer() {
           "Content-Type": "audio/mpeg",
           "Content-Length": total,
           "Accept-Ranges": "bytes",
+          "Access-Control-Allow-Origin": "*",
           "Cache-Control": "public, max-age=86400"
         });
         return res.end(audioBuffer);
@@ -178,8 +180,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         .listen(config.port, () => console.log(`SightGuide HTTPS on https://localhost:${config.port} — live AI ${isConfigured() ? "configured" : "not configured, Demo mode only"}`));
     });
   } else {
-    createServer().listen(config.port, () => {
-      console.log(`SightGuide on http://localhost:${config.port} — live AI ${isConfigured() ? "configured" : "not configured, Demo mode only"}`);
+    const host = process.env.HOST || "0.0.0.0";
+    createServer().listen(config.port, host, () => {
+      console.log(`SightGuide on http://${host}:${config.port} — live AI ${isConfigured() ? "configured" : "not configured, Demo mode only"}`);
       console.log("Phone camera note: phone browsers block cameras on http://<LAN-IP>. Use START-PHONE-CAMERA.bat for a trusted HTTPS URL.");
     });
   }

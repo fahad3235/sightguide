@@ -167,6 +167,44 @@ $("torchBtn")?.addEventListener("click", () => {
   toggleTorch();
 });
 
+const apiInput = $("apiUrlInput");
+const saveApiBtn = $("saveApiBtn");
+const apiStatusMsg = $("apiStatusMsg");
+
+if (apiInput) {
+  const currentBase = localStorage.getItem("sightguide_api_base") || "";
+  apiInput.value = currentBase;
+  if (currentBase && apiStatusMsg) {
+    apiStatusMsg.textContent = `Configured backend: ${currentBase}`;
+  }
+  if (saveApiBtn) {
+    saveApiBtn.addEventListener("click", async () => {
+      tactileHaptic();
+      const raw = (apiInput.value || "").trim().replace(/\/+$/, "");
+      if (raw) {
+        localStorage.setItem("sightguide_api_base", raw);
+        if (apiStatusMsg) apiStatusMsg.textContent = "Connecting to " + raw + "...";
+        try {
+          const res = await fetch(`${raw}/api/health`);
+          if (res.ok) {
+            const data = await res.json();
+            if (apiStatusMsg) apiStatusMsg.textContent = `Connected! Live AI: ${data.configured ? "Ready" : "Needs MODEL_API_KEY"}`;
+            speak("Backend server connected.");
+          } else {
+            if (apiStatusMsg) apiStatusMsg.textContent = `Saved. Server responded with HTTP ${res.status}`;
+          }
+        } catch (err) {
+          if (apiStatusMsg) apiStatusMsg.textContent = "Saved URL. (Pending online: " + (err.message || "failed") + ")";
+        }
+      } else {
+        localStorage.removeItem("sightguide_api_base");
+        if (apiStatusMsg) apiStatusMsg.textContent = "Reset to default auto backend.";
+        speak("Reset to default backend.");
+      }
+    });
+  }
+}
+
 /* ==========================================================================
    Pipeline & State
    ========================================================================== */
