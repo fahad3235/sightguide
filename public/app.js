@@ -788,14 +788,27 @@ function stopCameraLoop() {
   }
 }
 
+const LIVE_BACKEND_TUNNEL = "https://decide-dream-convert-accessing.trycloudflare.com";
+
 export function getApiUrl(endpoint) {
   try {
     const params = new URLSearchParams(window.location.search);
     const queryBase = params.get("api");
     const storedBase = localStorage.getItem("sightguide_api_base");
-    const base = (queryBase || storedBase || "").trim().replace(/\/+$/, "");
-    if (queryBase) localStorage.setItem("sightguide_api_base", queryBase);
-    return base ? `${base}${endpoint}` : endpoint;
+    if (queryBase) {
+      const clean = queryBase.trim().replace(/\/+$/, "");
+      localStorage.setItem("sightguide_api_base", clean);
+      return `${clean}${endpoint}`;
+    }
+    if (storedBase) {
+      return `${storedBase.trim().replace(/\/+$/, "")}${endpoint}`;
+    }
+    // If hosted on Netlify, GitHub Pages, or any static preview, automatically bridge to live Meta AI backend
+    const host = (typeof window !== "undefined" && window.location && window.location.hostname) ? window.location.hostname : "";
+    if (host.includes("netlify.app") || host.includes("github.io") || host.includes("pages.dev") || host.includes("vercel.app")) {
+      return `${LIVE_BACKEND_TUNNEL}${endpoint}`;
+    }
+    return endpoint;
   } catch {
     return endpoint;
   }
