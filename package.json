@@ -1,0 +1,13 @@
+{
+  "description": "SightGuide: live video assistive guide for blind and low-vision users. Experimental prototype, assistive only.",
+  "engines": {
+    "node": ">=20"
+  },
+  "name": "sightguide",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "type": "module",
+  "version": "2.0.0"
+}

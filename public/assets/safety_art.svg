@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 170" width="100%" height="auto">
+  <defs>
+    <linearGradient id="safety_sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#f0fdf4"/>
+    </linearGradient>
+    <linearGradient id="safety_ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#bbf7d0"/>
+      <stop offset="100%" stop-color="#86efac"/>
+    </linearGradient>
+    <linearGradient id="path_grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+  </defs>
+  <!-- Background sky -->
+  <rect width="360" height="170" rx="16" fill="url(#safety_sky)"/>
+  <!-- Distant buildings -->
+  <rect x="25" y="45" width="30" height="70" fill="#94a3b8" opacity="0.5"/>
+  <rect x="60" y="30" width="35" height="85" fill="#cbd5e1" opacity="0.6"/>
+  <rect x="260" y="35" width="32" height="80" fill="#cbd5e1" opacity="0.6"/>
+  <rect x="298" y="50" width="36" height="65" fill="#94a3b8" opacity="0.5"/>
+  <!-- Park greenery ground -->
+  <rect y="115" width="360" height="55" fill="url(#safety_ground)"/>
+  <!-- Trees -->
+  <circle cx="85" cy="85" r="28" fill="#22c55e" opacity="0.85"/>
+  <circle cx="115" cy="90" r="22" fill="#16a34a" opacity="0.9"/>
+  <circle cx="240" cy="88" r="25" fill="#16a34a" opacity="0.9"/>
+  <circle cx="270" cy="84" r="28" fill="#22c55e" opacity="0.85"/>
+  <!-- Curved walking path -->
+  <polygon points="150,115 210,115 255,170 105,170" fill="url(#path_grad)"/>
+  <!-- Person walking with white cane -->
+  <!-- Head -->
+  <circle cx="180" cy="82" r="9" fill="#1e293b"/>
+  <!-- Torso & Blue jacket -->
+  <rect x="172" y="91" width="16" height="30" rx="5" fill="#2563eb"/>
+  <!-- Backpack -->
+  <rect x="164" y="94" width="9" height="22" rx="3" fill="#1e3a5f"/>
+  <!-- White Cane (angled down) -->
+  <line x1="187" y1="102" x2="218" y2="148" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <line x1="187" y1="102" x2="194" y2="112" stroke="#dc2626" stroke-width="3"/>
+  <circle cx="218" cy="148" r="2.5" fill="#dc2626"/>
+  <!-- Legs -->
+  <rect x="173" y="121" width="6" height="24" rx="2" fill="#1e293b"/>
+  <rect x="181" y="121" width="6" height="22" rx="2" fill="#1e293b"/>
+</svg>

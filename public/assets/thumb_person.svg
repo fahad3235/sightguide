@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90" width="120" height="90" fill="none">
+  <defs>
+    <linearGradient id="pBg" x1="0" y1="0" x2="0" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="pathGrad" x1="0" y1="0" x2="0" y2="100%">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <linearGradient id="personGrad" x1="0" y1="0" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Canvas -->
+  <rect width="120" height="90" rx="8" fill="url(#pBg)"/>
+  
+  <!-- Perspective Sidewalk Path -->
+  <polygon points="40,30 80,30 112,90 8,90" fill="url(#pathGrad)" opacity="0.45"/>
+  <line x1="60" y1="30" x2="60" y2="90" stroke="#ffffff" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"/>
+
+  <!-- Distant Architecture Silhouette -->
+  <rect x="12" y="14" width="22" height="35" rx="3" fill="#cbd5e1" opacity="0.7"/>
+  <rect x="86" y="10" width="24" height="39" rx="3" fill="#cbd5e1" opacity="0.7"/>
+
+  <!-- Pedestrian Silhouette & Tracking Box -->
+  <g transform="translate(62, 26)">
+    <!-- Shadow -->
+    <ellipse cx="12" cy="52" rx="14" ry="4" fill="#0f172a" opacity="0.15"/>
+    <!-- Head -->
+    <circle cx="12" cy="8" r="6" fill="#1e293b"/>
+    <!-- Torso with Backpack -->
+    <rect x="6" y="16" width="12" height="18" rx="4" fill="url(#personGrad)"/>
+    <rect x="2" y="18" width="6" height="12" rx="3" fill="#7f1d1d"/>
+    <!-- Legs in Motion -->
+    <path d="M9 34 L7 50 M15 34 L17 50" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Tactile AI Bounding Box -->
+    <rect x="-4" y="0" width="32" height="54" rx="6" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 2"/>
+    <!-- Floating Tag -->
+    <rect x="-6" y="-12" width="36" height="12" rx="4" fill="#ef4444"/>
+    <text x="12" y="-3.5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7.5" font-weight="700" fill="#ffffff" text-anchor="middle">PERSON</text>
+  </g>
+</svg>

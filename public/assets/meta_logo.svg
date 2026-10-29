@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" width="100" height="24">
+  <defs>
+    <linearGradient id="metaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0064e0"/>
+      <stop offset="50%" stop-color="#0080fb"/>
+      <stop offset="100%" stop-color="#0064e0"/>
+    </linearGradient>
+  </defs>
+  <!-- Infinity symbol -->
+  <path d="M14.5 4.5 C10.5 4.5 7.5 7.5 7.5 12 C7.5 16.5 10.5 19.5 14.5 19.5 C18.2 19.5 21 16.5 23.5 13.5 L24 13 L24.5 13.5 C27 16.5 29.8 19.5 33.5 19.5 C37.5 19.5 40.5 16.5 40.5 12 C40.5 7.5 37.5 4.5 33.5 4.5 C29.8 4.5 27 7.5 24.5 10.5 L24 11 L23.5 10.5 C21 7.5 18.2 4.5 14.5 4.5 Z M14.5 7.8 C16.8 7.8 18.8 9.8 20.8 12.2 C18.8 14.6 16.8 16.2 14.5 16.2 C12.2 16.2 10.8 14.4 10.8 12 C10.8 9.6 12.2 7.8 14.5 7.8 Z M33.5 7.8 C35.8 7.8 37.2 9.6 37.2 12 C37.2 14.4 35.8 16.2 33.5 16.2 C31.2 16.2 29.2 14.6 27.2 12.2 C29.2 9.8 31.2 7.8 33.5 7.8 Z" fill="url(#metaGrad)"/>
+  <!-- Meta Text -->
+  <text x="47" y="16.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#0064e0" letter-spacing="-0.5px">Meta</text>
+</svg>

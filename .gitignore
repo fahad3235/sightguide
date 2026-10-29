@@ -1,0 +1,52 @@
+# Environment & Secrets (Do not upload any .env or env example files to GitHub)
+.env
+.env.*
+.env.example
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+*.env.*
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data & Logs
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# OS & System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# IDE & Editor configurations
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Build outputs & Archives
+dist/
+build/
+*.zip
+*.tar.gz
+*.tgz
+*.rar

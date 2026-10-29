@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90" width="120" height="90" fill="none">
+  <defs>
+    <linearGradient id="stBg" x1="0" y1="0" x2="0" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0" y1="0" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="120" height="90" rx="8" fill="url(#stBg)"/>
+
+  <!-- Descending Stair Steps with Depth & Perspective -->
+  <polygon points="15,22 105,22 95,34 25,34" fill="#cbd5e1"/>
+  <polygon points="25,34 95,34 95,40 25,40" fill="#94a3b8"/>
+
+  <polygon points="20,40 100,40 90,52 30,52" fill="#cbd5e1"/>
+  <polygon points="30,52 90,52 90,58 30,58" fill="#94a3b8"/>
+
+  <polygon points="25,58 95,58 85,70 35,70" fill="#cbd5e1"/>
+  <polygon points="35,70 85,70 85,76 35,76" fill="#94a3b8"/>
+
+  <!-- Depth Shadow Ground -->
+  <polygon points="30,76 90,76 105,90 15,90" fill="#64748b" opacity="0.25"/>
+
+  <!-- Steps Hazard AI Highlight Box -->
+  <g transform="translate(24, 18)">
+    <rect x="0" y="0" width="72" height="60" rx="6" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 2"/>
+    <!-- Floating Tag -->
+    <rect x="18" y="-10" width="36" height="12" rx="4" fill="url(#amberGrad)"/>
+    <text x="36" y="-1.5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="7.5" font-weight="700" fill="#ffffff" text-anchor="middle">STEPS</text>
+    <!-- Down Arrow Icon inside -->
+    <path d="M36 22 L36 38 M30 32 L36 38 L42 32" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

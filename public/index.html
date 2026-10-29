@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SightGuide: AI-powered navigation for blind and low-vision individuals. Assistive prototype built for Meta Global AI Developer Hackathon 2026.">
+  <meta name="theme-color" content="#07152b">
+  <title>SightGuide: Spatial Vision &amp; Audio Navigation</title>
+  <link rel="icon" type="image/png" href="assets/sightguide_logo.png">
+  <link rel="apple-touch-icon" href="assets/sightguide_logo.png">
+  <link rel="stylesheet" href="styles.css?v=3.6">
+</head>
+<body class="desktop-view-active">
+  <a class="skip-link" href="#guidanceText">Skip to current guidance</a>
+
+  <!-- ================= TOP RESPONSIVE MASTER NAVIGATION BAR ================= -->
+  <header class="master-header">
+    <div class="header-brand" data-nav="welcome" role="button" tabindex="0" style="cursor: pointer;" aria-label="SightGuide Home">
+      <img src="assets/sightguide_logo.png" alt="SightGuide App Icon" class="brand-app-icon" width="34" height="34">
+      <div class="brand-text-group">
+        <span class="brand-title-text">Sight<span class="brand-accent">Guide</span></span>
+        <span class="header-tagline">Spatial Audio Navigation</span>
+      </div>
+    </div>
+
+    <!-- Desktop Navigation Links with Handcrafted SVG Micro-Icons -->
+    <nav class="master-nav" aria-label="Main Navigation">
+      <button class="nav-item-btn active" data-nav="welcome" type="button">
+        <svg class="nav-svg-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="nav-item-btn" data-nav="live" type="button">
+        <svg class="nav-svg-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/><circle cx="12" cy="12" r="11"/></svg>
+        <span>Live Guide</span>
+      </button>
+      <button class="nav-item-btn" data-nav="demo" type="button">
+        <svg class="nav-svg-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Scenarios</span>
+      </button>
+      <button class="nav-item-btn" data-nav="history" type="button">
+        <svg class="nav-svg-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>History</span>
+      </button>
+      <button class="nav-item-btn" data-nav="settings" type="button">
+        <svg class="nav-svg-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+      <button class="nav-item-btn" data-nav="about" type="button">
+        <svg class="nav-svg-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>About</span>
+      </button>
+    </nav>
+
+    <!-- Header Quick Actions -->
+    <div class="header-actions">
+      <div class="header-status-pill" aria-label="AI Connection Status">
+        <span class="header-status-dot"></span>
+        <span class="header-status-txt">Meta AI Active</span>
+      </div>
+      <button class="header-action-btn" id="headerTestVoiceBtn" type="button">
+        <svg class="btn-micro-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        <span>Test Voice</span>
+      </button>
+      <button class="header-action-btn btn-primary" id="headerStartLiveBtn" type="button">
+        <svg class="btn-micro-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/></svg>
+        <span>Start Live</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN APP CONTAINER ================= -->
+  <main class="main-wrapper">
+    <div class="desktop-shell" id="desktopShell">
+      
+      <!-- Primary Application Stage (Responsive for Phone, Tablet, PC) -->
+      <div class="app-stage phone" id="phone" role="region" aria-label="SightGuide Application Stage">
+
+        <!-- SCREEN 1: WELCOME SCREEN -->
+        <section class="screen screen-active" data-screen="welcome" aria-label="Welcome Screen">
+
+
+          <div class="welcome-hero">
+            <img src="assets/hero_walking.jpg" alt="A young man with backpack walking forward along a sunny city street using a white cane" class="hero-art-photo">
+            
+            <div class="hero-brand-mark">
+              <img src="assets/sightguide_logo.png" alt="SightGuide" class="hero-app-logo" width="72" height="72">
+            </div>
+            
+            <h1 class="brand">Sight<span>Guide</span></h1>
+            <p class="tagline">See the world with your ears</p>
+            <p class="sub">Next-generation spatial assistive navigation powered by Meta AI for blind and visually impaired individuals.</p>
+          </div>
+
+          <div class="screen-pad">
+            <button class="btn-blue" id="getStartedBtn" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+              <span>Get Started</span>
+            </button>
+            <button class="btn-outline" id="tryDemoBtn" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Try Demo Mode</span>
+            </button>
+            <button class="btn-ghost" id="testVoiceBtn" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>Test Voice Audio</span>
+            </button>
+            <p class="built-note">
+              <svg class="heart-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <span>Built for a more inclusive world</span>
+            </p>
+          </div>
+        </section>
+
+        <!-- SCREEN 2: CAMERA PERMISSION -->
+        <section class="screen screen-dark" data-screen="permission" aria-label="Camera Permission Screen">
+          <button class="back-btn" data-nav="welcome" type="button" aria-label="Go back to welcome">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+
+          <div class="perm-center">
+            <div class="perm-icon-wrapper" aria-hidden="true">
+              <svg class="perm-cam-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span class="perm-check-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </div>
+            <h2 class="perm-title">Camera Permission</h2>
+            <p class="perm-subtitle">SightGuide needs access to your camera to see and guide you in real time.</p>
+          </div>
+
+          <div class="perm-list-card">
+            <div class="perm-item">
+              <span class="perm-round-ic" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </span>
+              <div class="perm-text">Uses rear camera<small>(facing environment)</small></div>
+            </div>
+            <div class="perm-item">
+              <span class="perm-round-ic" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </span>
+              <div class="perm-text">Processes frames every<small>1 to 2 seconds</small></div>
+            </div>
+            <div class="perm-item">
+              <span class="perm-round-ic" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <div class="perm-text">Does not store your video</div>
+            </div>
+          </div>
+
+          <div class="screen-pad">
+            <button class="btn-blue" id="allowCameraBtn" type="button">Allow Camera</button>
+            <button class="btn-ghost" data-nav="welcome" type="button">Not Now</button>
+          </div>
+        </section>
+
+        <!-- SCREEN 3: LIVE MODE (MAIN NAVIGATION SCREEN) -->
+        <section class="screen screen-dark" data-screen="live" aria-label="Live Assistive Screen">
+          <div class="live-top-bar">
+            <div class="live-top-left">
+              <span class="live-pill" id="livePill">LIVE</span>
+              <button class="icon-btn-torch" id="torchBtn" type="button" aria-label="Toggle flashlight" title="Toggle Flashlight">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </button>
+            </div>
+            <button class="icon-btn-settings" data-nav="settings" type="button" aria-label="Open settings">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+          </div>
+
+          <!-- Video / Canvas Live Viewport -->
+          <div class="viewport-container">
+            <video id="liveVideo" autoplay playsinline muted poster="assets/live_scene_pedestrian.jpg"></video>
+            <canvas id="sampleCanvas" width="640" height="440"></canvas>
+          </div>
+
+          <!-- Camera status / blocked-reason banner (hidden unless camera fails) -->
+          <div class="camera-banner" id="cameraBanner" role="alert" hidden>
+            <p class="camera-banner-text" id="cameraBannerText">Camera is not available.</p>
+            <div class="camera-banner-actions">
+              <button class="btn-mini btn-primary" id="photoFallbackBtn" type="button">Take a photo instead</button>
+              <button class="btn-mini btn-accent" id="bannerDemoBtn" type="button">Use Demo Mode</button>
+            </div>
+            <input type="file" id="photoFallbackInput" accept="image/*" capture="environment" hidden>
+          </div>
+
+          <!-- Guidance Card (Dark emerald/green with speaker & voice agent) -->
+          <div class="guidance-box" aria-label="Current Spoken Instruction">
+            <button class="speaker-btn" id="speakerBtn" type="button" aria-label="Repeat guidance">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </button>
+            <div class="guidance-content">
+              <h2 class="guidance-heading" id="guidanceText" tabindex="-1">Person on your right, keep left.</h2>
+              <span class="guidance-pill-sub" id="metaDistance">Close, 1 to 3 m</span>
+            </div>
+            <button class="voice-agent-btn" id="voiceAgentBtn" type="button" aria-label="Speak to Meta AI Voice Agent" title="Tap to talk to AI">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- One-Tap Voice Assistant Questions -->
+          <div class="voice-chip-row" role="region" aria-label="Voice Agent Inquiries">
+            <button class="voice-chip" type="button" data-prompt="What is in front of me?">What&rsquo;s ahead?</button>
+            <button class="voice-chip" type="button" data-prompt="Describe the full scene in detail.">Describe scene</button>
+            <button class="voice-chip" type="button" data-prompt="Is my walking path clear of obstacles?">Is path clear?</button>
+          </div>
+
+          <!-- Active Track Chip Row -->
+          <div class="active-chip-row" id="chipRow" aria-label="Active object tracking">
+            <span class="obj-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/></svg>
+              <span>Person #03</span>
+            </span>
+            <span class="obj-chip-arrow">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+            <span class="obj-chip">Moving</span>
+            <span class="obj-chip obj-chip-active"><span class="chip-live-dot"></span> Active</span>
+          </div>
+
+          <!-- Live Bottom Actions: Demo Mode, Big Stop Button, Settings -->
+          <div class="live-action-bar">
+            <button class="action-nav-item" data-nav="demo" type="button">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Demo Mode</span>
+            </button>
+            <button class="btn-stop-main" id="stopBtn" type="button" aria-label="Stop navigation">
+              <div class="stop-icon-square"></div>
+              <span class="stop-label">Stop</span>
+            </button>
+            <button class="action-nav-item" data-nav="settings" type="button">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- SCREEN 4: NAVIGATION HISTORY -->
+        <section class="screen" data-screen="history" aria-label="Navigation History Screen">
+
+
+          <div class="screen-head">
+            <button class="back-btn dark-back" data-nav="live" type="button" aria-label="Back to live view">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <h2>Navigation History</h2>
+          </div>
+
+          <div class="tabs-pill-row">
+            <button class="tab-pill active" type="button">Recent</button>
+            <button class="tab-pill" type="button">All</button>
+          </div>
+
+          <!-- 5 Rich History Cards Matching UI Board -->
+          <ul class="history-cards-list" id="historyList">
+            <li class="history-card-item">
+              <img src="assets/thumb_person.svg" alt="Person thumbnail" class="history-thumb-img">
+              <div class="history-content">
+                <p class="history-title">Person on your right. <span>Keep left.</span></p>
+                <p class="history-time">10:24 AM (1 min ago)</p>
+              </div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="history-card-item">
+              <img src="assets/thumb_steps.svg" alt="Steps down thumbnail" class="history-thumb-img">
+              <div class="history-content">
+                <p class="history-title">Steps down ahead. <span>Slow down.</span></p>
+                <p class="history-time">10:22 AM (3 min ago)</p>
+              </div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="history-card-item">
+              <img src="assets/thumb_side.svg" alt="Pole thumbnail" class="history-thumb-img">
+              <div class="history-content">
+                <p class="history-title">Pole on left. <span>Keep right.</span></p>
+                <p class="history-time">10:19 AM (6 min ago)</p>
+              </div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="history-card-item">
+              <img src="assets/thumb_vehicle.svg" alt="Vehicle thumbnail" class="history-thumb-img">
+              <div class="history-content">
+                <p class="history-title">Vehicle ahead. <span>Stop.</span></p>
+                <p class="history-time">10:16 AM (9 min ago)</p>
+              </div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="history-card-item">
+              <img src="assets/thumb_drain.svg" alt="Drain thumbnail" class="history-thumb-img">
+              <div class="history-content">
+                <p class="history-title">Open drain ahead. <span>Keep left.</span></p>
+                <p class="history-time">10:12 AM (13 min ago)</p>
+              </div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+          </ul>
+
+          <nav class="light-bottom-nav" aria-label="History navigation bar">
+            <button class="nav-item-btn" data-nav="live" type="button">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <small>Home</small>
+            </button>
+            <button class="nav-item-btn active" data-nav="history" type="button">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <small>History</small>
+            </button>
+            <button class="nav-item-btn" data-nav="settings" type="button">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <small>Settings</small>
+            </button>
+          </nav>
+        </section>
+
+        <!-- SCREEN 5: SETTINGS SCREEN -->
+        <section class="screen" data-screen="settings" aria-label="Settings Screen">
+
+
+          <div class="screen-head">
+            <button class="back-btn dark-back" data-nav="live" type="button" aria-label="Back to live view">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <h2>Settings</h2>
+          </div>
+
+          <h3 class="settings-section-title">Voice &amp; Language</h3>
+          <div class="setting-card-row" id="voiceSettingRow" style="cursor: pointer;" title="Tap to test voice speech">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </span>
+            <div class="setting-row-main">English (US)<small>Tap to test voice speech</small></div>
+            <span class="history-chevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </span>
+            <div class="setting-row-main">Language (Optional)<small>Bangla (বাংলা)</small></div>
+            <button class="toggle-switch" id="banglaToggle" type="button" role="switch" aria-checked="false" aria-label="Bangla language toggle"></button>
+          </div>
+
+          <h3 class="settings-section-title">Sensory &amp; Spatial Assistance</h3>
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+            </span>
+            <div class="setting-row-main">Spatial Binaural Audio<small>Pans sonar chimes to left or right earbud</small></div>
+            <button class="toggle-switch switch-on" id="spatialAudioToggle" type="button" role="switch" aria-checked="true" aria-label="Toggle spatial audio"></button>
+          </div>
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            </span>
+            <div class="setting-row-main">Tactile Haptics<small>Vibrates phone for hazard collision alerts</small></div>
+            <button class="toggle-switch switch-on" id="hapticToggle" type="button" role="switch" aria-checked="true" aria-label="Toggle tactile haptics"></button>
+          </div>
+
+          <h3 class="settings-section-title">Speech Cadence</h3>
+          <label class="setting-radio-option">
+            <input type="radio" name="speechRateRadio" value="0.9"> Calm (0.9x speed)
+          </label>
+          <label class="setting-radio-option">
+            <input type="radio" name="speechRateRadio" value="1.0" checked> Natural (1.0x speed)
+          </label>
+          <label class="setting-radio-option">
+            <input type="radio" name="speechRateRadio" value="1.15"> Brisk (1.15x speed)
+          </label>
+
+          <h3 class="settings-section-title">Guidance Style</h3>
+          <label class="setting-radio-option">
+            <input type="radio" name="guidanceStyle" value="Normal" checked> Normal
+          </label>
+          <label class="setting-radio-option">
+            <input type="radio" name="guidanceStyle" value="Short"> Short
+          </label>
+          <label class="setting-radio-option">
+            <input type="radio" name="guidanceStyle" value="Detailed"> Detailed
+          </label>
+
+          <h3 class="settings-section-title">Camera</h3>
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </span>
+            <div class="setting-row-main">Rear Camera (Recommended)<small>Uses the back camera for a wider view</small></div>
+            <span class="history-chevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+
+          <h3 class="settings-section-title">App Mode</h3>
+          <label class="setting-radio-option">
+            <input type="radio" name="appModeRadio" value="live" checked> Live Mode
+          </label>
+          <label class="setting-radio-option">
+            <input type="radio" name="appModeRadio" value="demo"> Demo Mode
+          </label>
+
+          <div class="setting-card-row clickable" data-nav="overlay" role="button" tabindex="0">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </span>
+            <div class="setting-row-main">Detection Overlay<small>Masks, tracking IDs, labels, opacity</small></div>
+            <span class="history-chevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="setting-card-row clickable" data-nav="processing" role="button" tabindex="0">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-5.04z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-5.04z"/></svg>
+            </span>
+            <div class="setting-row-main">AI Processing<small>Muse Spark + SAM 3.1 pipeline</small></div>
+            <span class="history-chevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="setting-card-row clickable" data-nav="about" role="button" tabindex="0">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </span>
+            <div class="setting-row-main">About SightGuide</div>
+            <span class="history-chevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+        </section>
+
+        <!-- SCREEN 6: DEMO MODE SCREEN -->
+        <section class="screen" data-screen="demo" aria-label="Demo Mode Screen">
+
+
+          <div class="screen-head">
+            <button class="back-btn dark-back" data-nav="live" type="button" aria-label="Back">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <h2>Demo Mode</h2>
+            <span class="demo-pill-badge">DEMO</span>
+          </div>
+
+          <p class="demo-instruction">Try SightGuide without an API key.<br>Use staged scenarios and sample data.</p>
+
+          <div class="tabs-pill-row">
+            <button class="tab-pill active" type="button">Scenarios</button>
+            <button class="tab-pill" data-nav="settings" type="button">Settings</button>
+          </div>
+
+          <!-- Hidden select for compatibility -->
+          <select id="scenarioSelect" class="sr-only"></select>
+
+          <!-- 5 Scenarios exactly matching design board -->
+          <ul class="scenarios-cards-list" id="scenarioList">
+            <li class="scenario-card-item selected" data-scenario="side">
+              <img src="assets/thumb_side.svg" alt="Side obstacle" class="scenario-thumb">
+              <div class="scenario-title">Side Obstacle <span>(Left)</span></div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="scenario-card-item" data-scenario="steps">
+              <img src="assets/thumb_steps.svg" alt="Steps down" class="scenario-thumb">
+              <div class="scenario-title">Steps Down <span>(Ahead)</span></div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="scenario-card-item" data-scenario="person">
+              <img src="assets/thumb_person.svg" alt="Moving person" class="scenario-thumb">
+              <div class="scenario-title">Moving Person <span>(Right)</span></div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="scenario-card-item" data-scenario="branch">
+              <img src="assets/thumb_branch.svg" alt="Low branch" class="scenario-thumb">
+              <div class="scenario-title">Low Branch <span>(Ahead)</span></div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+            <li class="scenario-card-item" data-scenario="drain">
+              <img src="assets/thumb_drain.svg" alt="Open drain" class="scenario-thumb">
+              <div class="scenario-title">Open Drain <span>(Ahead)</span></div>
+              <span class="history-chevron">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </li>
+          </ul>
+
+          <div class="screen-pad">
+            <button class="btn-blue" id="startDemoBtn2" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Start Demo</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- SCREEN 7: LIVE VIEW (EXPANDED) -->
+        <section class="screen screen-dark" data-screen="live-expanded" aria-label="Live View Expanded">
+          <div class="live-top-bar">
+            <span class="live-pill">LIVE</span>
+            <span class="live-objects-tag">3 objects detected</span>
+          </div>
+
+          <!-- Video / Canvas Live Viewport -->
+          <div class="viewport-container" style="aspect-ratio: 16/10;">
+            <canvas id="sampleCanvasExpanded" width="640" height="400"></canvas>
+          </div>
+
+          <!-- Audio Waveform Visualizer -->
+          <div class="audio-visualizer-box">
+            <div class="vis-title">AI is analyzing the scene…</div>
+            <div class="waveform-bars">
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+              <div class="waveform-bar"></div>
+            </div>
+          </div>
+
+          <!-- 3 Object Cards Row: Person, Pole, Step -->
+          <div class="detected-cards-grid">
+            <div class="det-card red">
+              <div class="det-card-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><path d="M12 8v8m-4-5l4 2 4-2m-4 5l-2 6m2-6l2 6"/></svg>
+              </div>
+              <p class="det-card-name">Person</p>
+              <p class="det-card-id">ID: 03</p>
+              <div class="det-card-dist">1 to 3 m</div>
+            </div>
+            <div class="det-card yellow">
+              <div class="det-card-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16"/></svg>
+              </div>
+              <p class="det-card-name">Pole</p>
+              <p class="det-card-id">ID: 07</p>
+              <div class="det-card-dist">&gt; 3 m</div>
+            </div>
+            <div class="det-card blue">
+              <div class="det-card-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 4 20 8 16 8 16 12 12 12 12 16 8 16 8 20 4 20"/></svg>
+              </div>
+              <p class="det-card-name">Step</p>
+              <p class="det-card-id">ID: 12</p>
+              <div class="det-card-dist">1 to 3 m</div>
+            </div>
+          </div>
+
+          <div class="live-action-bar">
+            <button class="action-nav-item" data-nav="demo" type="button">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Demo Mode</span>
+            </button>
+            <button class="btn-stop-main" data-nav="live" type="button" aria-label="Stop navigation">
+              <div class="stop-icon-square"></div>
+              <span class="stop-label">Stop</span>
+            </button>
+            <button class="action-nav-item" data-nav="settings" type="button">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- SCREEN 8: DETECTION OVERLAY CONTROLS -->
+        <section class="screen" data-screen="overlay" aria-label="Detection Overlay Controls">
+
+
+          <div class="screen-head">
+            <button class="back-btn dark-back" data-nav="settings" type="button" aria-label="Back to settings">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <h2>Detection Overlay</h2>
+          </div>
+
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </span>
+            <div class="setting-row-main">Show Masks</div>
+            <button class="toggle-switch switch-on" id="optMasks" type="button" role="switch" aria-checked="true" aria-label="Toggle masks"></button>
+          </div>
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>
+            </span>
+            <div class="setting-row-main">Show Tracking IDs</div>
+            <button class="toggle-switch switch-on" id="optIds" type="button" role="switch" aria-checked="true" aria-label="Toggle tracking IDs"></button>
+          </div>
+          <div class="setting-card-row">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            </span>
+            <div class="setting-row-main">Show Labels</div>
+            <button class="toggle-switch switch-on" id="optLabels" type="button" role="switch" aria-checked="true" aria-label="Toggle labels"></button>
+          </div>
+
+          <h3 class="settings-section-title">Display Mode</h3>
+          <div class="segmented-control">
+            <button class="seg-button seg-active" id="dispLive" type="button">Live Feed</button>
+            <button class="seg-button" id="dispOverlay" type="button">Overlay Only</button>
+          </div>
+
+          <h3 class="settings-section-title">Mask Opacity</h3>
+          <div class="slider-container">
+            <input type="range" id="optOpacity" min="0" max="100" value="70">
+            <span class="slider-value-pill" id="optOpacityVal">70%</span>
+          </div>
+
+          <div class="info-note-card">
+            Tracking keeps the same ID across frames so you know if an object is closer, moving or gone. Changes apply to the next sampled frame.
+          </div>
+        </section>
+
+        <!-- SCREEN 9: AI PROCESSING -->
+        <section class="screen" data-screen="processing" aria-label="AI Processing Pipeline">
+
+
+          <div class="screen-head">
+            <button class="back-btn dark-back" data-nav="settings" type="button" aria-label="Back">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <h2>AI Processing</h2>
+          </div>
+
+          <div class="ai-meta-subtitle">
+            <span class="live-pill">LIVE</span>
+            <span>Muse Spark + SAM 3.1</span>
+          </div>
+
+          <ol class="pipeline-list">
+            <li class="pipeline-card">
+              <span class="pipe-step-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </span>
+              <div class="pipe-step-text">1. Capture Frame<small>(Every 1 to 2 seconds)</small></div>
+              <span class="pipe-status-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </li>
+            <li class="pipeline-card">
+              <span class="pipe-step-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              </span>
+              <div class="pipe-step-text">2. Segment &amp; Track<small>(SAM 3.1)</small></div>
+              <span class="pipe-status-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </li>
+            <li class="pipeline-card">
+              <span class="pipe-step-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <div class="pipe-step-text">3. Prioritize Risk<small>(Closest + Moving + Path)</small></div>
+              <span class="pipe-status-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </li>
+            <li class="pipeline-card">
+              <span class="pipe-step-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              </span>
+              <div class="pipe-step-text">4. Decide Direction<small>(Muse Spark, locally validated)</small></div>
+              <span class="pipe-status-pulse"></span>
+            </li>
+            <li class="pipeline-card">
+              <span class="pipe-step-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              </span>
+              <div class="pipe-step-text">5. Speak &amp; Display<small>(English Voice)</small></div>
+              <span class="pipe-status-pending"></span>
+            </li>
+          </ol>
+
+          <div class="current-models-card">
+            <h3>Current Models</h3>
+            <div class="model-row">
+              <strong>SAM 3.1</strong>
+              <span>Segmentation &amp; Tracking</span>
+            </div>
+            <div class="model-row">
+              <strong>Muse Spark</strong>
+              <span>Reasoning &amp; Direction</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 10: ABOUT SCREEN -->
+        <section class="screen" data-screen="about" aria-label="About SightGuide Screen">
+
+
+          <div class="screen-head">
+            <button class="back-btn dark-back" data-nav="settings" type="button" aria-label="Back">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+          </div>
+
+          <div class="about-container">
+            <div class="about-logo-wrapper">
+              <img src="assets/sightguide_logo.png" alt="SightGuide App Icon" class="about-app-logo" width="80" height="80">
+            </div>
+            <h2 class="brand">Sight<span>Guide</span></h2>
+            <p class="about-brand-sub">AI-Powered Accessibility</p>
+            <p class="about-desc">SightGuide helps blind and low-vision individuals navigate safely using real-time camera vision, AI tracking, and voice guidance.</p>
+
+            <div class="about-details-card">
+              <div>
+                <div class="about-row-title">Meta AI Models</div>
+                <div class="about-row-sub">SAM 3.1 + Muse Spark</div>
+              </div>
+              <div>
+                <div class="about-row-title">Built for</div>
+                <div class="about-row-sub">Meta Global AI Developer Hackathon 2026</div>
+              </div>
+              <div>
+                <div class="about-row-title">Developer</div>
+                <div class="about-row-sub">Ishan Ahmed Fahad<br>Daffodil International University<br>CIS, Bangladesh</div>
+              </div>
+            </div>
+
+            <div class="meta-official-branding">
+              <img src="assets/meta_logo.svg" alt="Meta Logo" style="height:24px;">
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 11: SAFETY NOTICE -->
+        <section class="screen" data-screen="safety" aria-label="Safety Notice Screen">
+
+
+          <div class="screen-head">
+            <button class="back-btn dark-back" data-nav="live" type="button" aria-label="Back">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+          </div>
+
+          <img src="assets/safety_art.svg" alt="Illustration of person walking with white cane" class="hero-art-safety">
+          
+          <h2 class="safety-heading">Your Safety Matters</h2>
+          <p class="safety-desc">SightGuide is an assistive guide, not a safety device. Always use a cane, guide dog or a sighted companion.</p>
+
+          <div class="safety-warning-box">
+            <strong>Assistive only.</strong> Guidance has a 1 to 3 second delay for API processing. It is not an instant collision warning. Do not use alone in traffic.
+          </div>
+
+          <div class="screen-pad">
+            <button class="btn-blue" data-nav="live" type="button">I Understand</button>
+            <button class="link-btn center" data-nav="about" type="button">Learn More</button>
+          </div>
+        </section>
+
+      </div> <!-- /phone -->
+
+      <!-- ================= DESKTOP SIDE PANEL (Desktop View) ================= -->
+      <aside class="desktop-panel" aria-label="Desktop Current Guidance Companion Panel">
+        <div class="dp-head">
+          <img src="assets/sightguide_logo.png" alt="SightGuide" class="brand-app-icon" width="36" height="36">
+          <span class="dp-brand">Sight<span>Guide</span></span>
+          <div class="avatar" aria-label="User avatar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+
+        <h2>Current Guidance</h2>
+        <div class="dp-guidance-card">
+          <div class="dp-speaker-ic" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          </div>
+          <div>
+            <p class="dp-guidance-text" id="dpGuidance">Person on your right, keep left.</p>
+            <div class="dp-guidance-sub" id="dpMeta">Close, 1 to 3 m</div>
+          </div>
+        </div>
+
+        <h2>Detected Objects</h2>
+        <ul class="dp-risk-list" id="dpRisk">
+          <li class="dp-risk-item">
+            <div class="dp-item-left">
+              <span class="dp-item-icon red" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><path d="M12 8v8m-4-5l4 2 4-2m-4 5l-2 6m2-6l2 6"/></svg>
+              </span>
+              <span>Person <small>ID: 03</small></span>
+            </div>
+            <span class="dp-item-chip red">1 to 3 m</span>
+          </li>
+          <li class="dp-risk-item">
+            <div class="dp-item-left">
+              <span class="dp-item-icon yellow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16M6 4v16M18 4v16"/></svg>
+              </span>
+              <span>Pole <small>ID: 07</small></span>
+            </div>
+            <span class="dp-item-chip yellow">&gt; 3 m</span>
+          </li>
+          <li class="dp-risk-item">
+            <div class="dp-item-left">
+              <span class="dp-item-icon blue" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 4 20 8 16 8 16 12 12 12 12 16 8 16 8 20 4 20"/></svg>
+              </span>
+              <span>Step <small>ID: 12</small></span>
+            </div>
+            <span class="dp-item-chip blue">1 to 3 m</span>
+          </li>
+        </ul>
+
+        <div class="dp-actions">
+          <button class="dp-btn" data-nav="demo" type="button">Demo Mode</button>
+          <button class="dp-btn dp-btn-stop" id="dpStop" type="button">Stop</button>
+          <button class="dp-btn" data-nav="settings" type="button">Settings</button>
+        </div>
+
+        <p class="dp-disclaimer">
+          <strong>Assistive only (not a safety device).</strong> Sampling 1.5s, SAM 3.1 + Muse Spark, English voice.
+        </p>
+        <p class="dp-credit">
+          Built by Ishan Ahmed Fahad, Daffodil International University, CIS, Bangladesh, Meta Global AI Developer Hackathon 2026
+        </p>
+      </aside>
+
+    </div> <!-- /desktop-shell -->
+
+
+
+  </main>
+
+  <!-- ================= MASTER FULL-WIDTH BOTTOM SHOWCASE BANNER ================= -->
+  <footer class="master-footer-banner" role="contentinfo">
+    <div class="footer-banner-inner">
+      <!-- Left: Logo & Tagline -->
+      <div class="fb-brand-section">
+        <img src="assets/sightguide_logo.png" alt="SightGuide" class="brand-app-icon" width="40" height="40">
+        <div>
+          <h2 class="fb-brand-title">Sight<span>Guide</span></h2>
+          <p class="fb-tagline">See the world with your ears.</p>
+        </div>
+      </div>
+
+      <!-- Center: 5 Features List -->
+      <div class="fb-features-list">
+        <div class="fb-feature-item">
+          <div class="fb-feature-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="fb-feature-text">Real-time<small>Camera Vision</small></div>
+        </div>
+        <div class="fb-feature-item">
+          <div class="fb-feature-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-5.04z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-5.04z"/></svg>
+          </div>
+          <div class="fb-feature-text">Meta AI Models<small>SAM 3.1 + Muse Spark</small></div>
+        </div>
+        <div class="fb-feature-item">
+          <div class="fb-feature-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div class="fb-feature-text">Object Tracking<small>Stable IDs &amp; Movement</small></div>
+        </div>
+        <div class="fb-feature-item">
+          <div class="fb-feature-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          </div>
+          <div class="fb-feature-text">Voice Guidance<small>Clear English Speech</small></div>
+        </div>
+        <div class="fb-feature-item">
+          <div class="fb-feature-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="fb-feature-text">Assistive Design<small>Phone First / Large Buttons</small></div>
+        </div>
+      </div>
+
+      <!-- Right: Hackathon Badge & Developer -->
+      <div class="fb-right-group">
+        <div class="fb-hackathon-pill">
+          <img src="assets/meta_logo.svg" alt="Meta" class="fb-meta-pill-logo">
+          <span>Global AI Developer Hackathon 2026</span>
+        </div>
+        <div class="fb-credit-box">
+          <div class="fb-credit-name">Built by Ishan Ahmed Fahad</div>
+          <div class="fb-credit-sub">Daffodil International University<br>CIS, Bangladesh</div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="app.js?v=3.6"></script>
+</body>
+</html>
