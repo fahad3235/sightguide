@@ -172,10 +172,10 @@ const saveApiBtn = $("saveApiBtn");
 const apiStatusMsg = $("apiStatusMsg");
 
 if (apiInput) {
-  const currentBase = localStorage.getItem("sightguide_api_base") || "";
+  const currentBase = localStorage.getItem("sightguide_api_base") || "https://sightguide.onrender.com";
   apiInput.value = currentBase;
-  if (currentBase && apiStatusMsg) {
-    apiStatusMsg.textContent = `Configured backend: ${currentBase}`;
+  if (apiStatusMsg) {
+    apiStatusMsg.textContent = `Active backend: ${currentBase}`;
   }
   if (saveApiBtn) {
     saveApiBtn.addEventListener("click", async () => {
@@ -826,7 +826,7 @@ function stopCameraLoop() {
   }
 }
 
-const LIVE_BACKEND_TUNNEL = "https://decide-dream-convert-accessing.trycloudflare.com";
+const RENDER_BACKEND_URL = "https://sightguide.onrender.com";
 
 export function getApiUrl(endpoint) {
   try {
@@ -836,15 +836,19 @@ export function getApiUrl(endpoint) {
     if (queryBase) {
       const clean = queryBase.trim().replace(/\/+$/, "");
       localStorage.setItem("sightguide_api_base", clean);
+      window.__SIGHTGUIDE_API_BASE = clean;
       return `${clean}${endpoint}`;
     }
     if (storedBase) {
-      return `${storedBase.trim().replace(/\/+$/, "")}${endpoint}`;
+      const clean = storedBase.trim().replace(/\/+$/, "");
+      window.__SIGHTGUIDE_API_BASE = clean;
+      return `${clean}${endpoint}`;
     }
-    // If hosted on Netlify, GitHub Pages, or any static preview, automatically bridge to live Meta AI backend
+    // If hosted on Netlify, GitHub Pages, or any static preview, automatically bridge to live Render cloud backend
     const host = (typeof window !== "undefined" && window.location && window.location.hostname) ? window.location.hostname : "";
     if (host.includes("netlify.app") || host.includes("github.io") || host.includes("pages.dev") || host.includes("vercel.app")) {
-      return `${LIVE_BACKEND_TUNNEL}${endpoint}`;
+      window.__SIGHTGUIDE_API_BASE = RENDER_BACKEND_URL;
+      return `${RENDER_BACKEND_URL}${endpoint}`;
     }
     return endpoint;
   } catch {
@@ -1282,3 +1286,17 @@ document.querySelectorAll(".voice-chip").forEach((chip) => {
 setTimeout(() => {
   renderCurrentFrame();
 }, 200);
+
+// Initialize backend connectivity and verify live Meta AI cloud status
+(async function initBackendHealth() {
+  try {
+    const healthUrl = getApiUrl("/api/health");
+    const res = await fetch(healthUrl);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.configured && els.livePill) {
+        els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">META AI LIVE</span>';
+      }
+    }
+  } catch {}
+})();

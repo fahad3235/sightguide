@@ -188,8 +188,26 @@ function emitSpeechEvent(speaking, text = "") {
   }
 }
 
+export function getTtsApiBase() {
+  try {
+    if (typeof window !== "undefined") {
+      if (window.__SIGHTGUIDE_API_BASE) {
+        return window.__SIGHTGUIDE_API_BASE.trim().replace(/\/+$/, "");
+      }
+      const stored = localStorage.getItem("sightguide_api_base");
+      if (stored) return stored.trim().replace(/\/+$/, "");
+      const host = (window.location && window.location.hostname) ? window.location.hostname : "";
+      if (host.includes("github.io") || host.includes("netlify.app") || host.includes("pages.dev") || host.includes("vercel.app")) {
+        return "https://sightguide.onrender.com";
+      }
+    }
+  } catch {}
+  return "";
+}
+
 async function playServerAudioTts(text, opts = {}) {
-  const url = `/api/tts?lang=en&text=${encodeURIComponent(text)}`;
+  const base = getTtsApiBase();
+  const url = `${base}/api/tts?lang=en&text=${encodeURIComponent(text)}`;
 
   isSpeaking = true;
   currentSpokenText = text;

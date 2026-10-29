@@ -85,7 +85,7 @@ export function createServer() {
         const result = await askVoiceAgent({ question: body.question, image: body.image || null });
         return sendJson(res, 200, { ok: true, answer: result.answer });
       }
-      if (req.method === "GET" && pathname === "/api/tts") {
+      if ((req.method === "GET" || req.method === "HEAD") && pathname === "/api/tts") {
         const parsedUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
         const text = (parsedUrl.searchParams.get("text") || "Path clear ahead.").trim().slice(0, 200);
         const cleanText = text.replace(/[\r\n\t]/g, " ");
