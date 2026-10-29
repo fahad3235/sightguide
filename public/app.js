@@ -1,7 +1,7 @@
 import { Tracker } from "./modules/tracker.js";
 import { rankTracks, fallbackGuidance } from "./modules/risk-engine.js";
 import { DirectionLock } from "./modules/direction-lock.js";
-import { speak, stopSpeech, speechAvailable, unlockSpeech, createVoiceRecognition, hasSpeechRecognition, playChime, setSpatialAudio, setSpeechRate } from "./modules/speech.js";
+import { speak, stopSpeech, speechAvailable, unlockSpeech, createVoiceRecognition, hasSpeechRecognition, playChime, setSpatialAudio, setSpeechRate, setRayBanMode, getRayBanMode, setLanguage, getLanguage, translateGuidance } from "./modules/speech.js";
 import { drawMaskOverlay, drawDemoScene } from "./modules/mask-renderer.js";
 import { DEMO_STEPS, SCENARIOS } from "./demo/scenarios.js";
 import { validateGuidance } from "./modules/validate-guidance.js";
@@ -130,11 +130,66 @@ $("dispOverlay")?.addEventListener("click", () => {
   renderCurrentFrame();
 });
 
-$("banglaToggle")?.addEventListener("click", () => {
-  const btn = $("banglaToggle");
-  const on = btn.classList.toggle("switch-on");
-  btn.setAttribute("aria-checked", String(on));
-});
+const langSelect = $("languageSelect");
+if (langSelect) {
+  langSelect.value = getLanguage();
+  langSelect.addEventListener("change", () => {
+    tactileHaptic("click");
+    const val = langSelect.value;
+    setLanguage(val);
+    const confirmations = {
+      en: "English language selected.",
+      es: "Idioma español seleccionado.",
+      bn: "বাংলা ভাষা নির্বাচন করা হয়েছে।",
+      hi: "हिन्दी भाषा चुनी गई।",
+      fr: "Langue française sélectionnée.",
+      ar: "تم اختيار اللغة العربية."
+    };
+    speak(confirmations[val] || "Language updated.", { immediate: true, lang: val });
+  });
+}
+
+const raybanToggle = $("raybanToggle");
+const raybanPill = $("raybanPill");
+if (raybanToggle) {
+  const isRayBan = getRayBanMode();
+  raybanToggle.classList.toggle("switch-on", isRayBan);
+  raybanToggle.setAttribute("aria-checked", isRayBan ? "true" : "false");
+  if (raybanPill) raybanPill.style.display = isRayBan ? "inline-flex" : "none";
+
+  raybanToggle.addEventListener("click", () => {
+    tactileHaptic("click");
+    const nowActive = !raybanToggle.classList.contains("switch-on");
+    raybanToggle.classList.toggle("switch-on", nowActive);
+    raybanToggle.setAttribute("aria-checked", nowActive ? "true" : "false");
+    setRayBanMode(nowActive);
+    if (raybanPill) raybanPill.style.display = nowActive ? "inline-flex" : "none";
+    if (nowActive) {
+      playChime("ok");
+      speak("Meta Ray-Ban Smart Glasses mode activated. Spatial audio optimized for open-ear frames.");
+    } else {
+      speak("Ray-Ban mode deactivated.");
+    }
+  });
+}
+
+const pocketBtn = $("pocketSaverBtn");
+const pocketOverlay = $("pocketOverlay");
+if (pocketBtn && pocketOverlay) {
+  pocketBtn.addEventListener("click", () => {
+    tactileHaptic("click");
+    pocketOverlay.style.display = "flex";
+    playChime("alert");
+    speak("Pocket display saver active. Audio navigation continues. Tap anywhere to wake screen.", { immediate: true });
+  });
+
+  pocketOverlay.addEventListener("click", () => {
+    tactileHaptic("click");
+    pocketOverlay.style.display = "none";
+    playChime("ok");
+    speak("Screen awakened.", { immediate: true });
+  });
+}
 
 $("spatialAudioToggle")?.addEventListener("click", () => {
   tactileHaptic();
@@ -1202,7 +1257,16 @@ document.querySelector(".dp-guidance-card")?.addEventListener("click", () => {
 // Settings: Voice row click
 $("voiceSettingRow")?.addEventListener("click", () => {
   unlockSpeech();
-  speak("SightGuide voice is active. Speech guidance is working clearly.");
+  const currentLang = getLanguage();
+  const samples = {
+    en: "SightGuide voice is active. Speech guidance is working clearly.",
+    es: "La voz de SightGuide está activa. La guía por voz funciona claramente.",
+    bn: "সাইটগাইড ভয়েস সক্রিয়। নির্দেশনা পরিষ্কারভাবে কাজ করছে।",
+    hi: "साइटगाइड आवाज़ सक्रिय है। ध्वनि मार्गदर्शन ठीक से काम कर रहा है।",
+    fr: "La voix de SightGuide est active. Le guidage vocal fonctionne clairement.",
+    ar: "صوت سايت جايد نشط. التوجيه الصوتي يعمل بوضوح."
+  };
+  speak(samples[currentLang] || samples.en, { immediate: true, lang: currentLang });
 });
 
 /* ==========================================================================
@@ -1252,10 +1316,16 @@ async function askMetaVoiceAgent(question) {
   }
 
   try {
+    const currentLang = getLanguage();
+    let queryWithLang = question;
+    if (currentLang !== "en") {
+      const langNames = { es: "Spanish", bn: "Bengali", hi: "Hindi", fr: "French", ar: "Arabic" };
+      queryWithLang = `${question} (Please respond concisely in ${langNames[currentLang] || currentLang}).`;
+    }
     const res = await fetch(getApiUrl("/api/voice-agent"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, image: imageData })
+      body: JSON.stringify({ question: queryWithLang, image: imageData, language: currentLang })
     });
     let answer = "Path appears clear ahead.";
     if (res.ok) {
@@ -1284,7 +1354,7 @@ async function askMetaVoiceAgent(question) {
     if (els.dpMeta) els.dpMeta.textContent = "Meta AI Voice Agent Response";
 
     playChime("ok");
-    speak(answer, { volume: 1.0, immediate: true });
+    speak(answer, { volume: 1.0, immediate: true, lang: currentLang });
   } catch {
     const fallback = "Path clear ahead. Proceed forward with caution.";
     if (els.guidanceText) els.guidanceText.textContent = fallback;

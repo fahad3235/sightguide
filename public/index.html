@@ -169,6 +169,14 @@
           <div class="live-top-bar">
             <div class="live-top-left">
               <span class="live-pill" id="livePill">LIVE</span>
+              <span class="rayban-pill" id="raybanPill" style="display: none;" title="Meta Ray-Ban Glasses Mode Active">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><line x1="14" y1="15" x2="10" y2="15"/><path d="M2.5 13L5 7c.7-1.3 2-2 3.5-2h7c1.5 0 2.8.7 3.5 2l2.5 6"/></svg>
+                <span>Ray-Ban Meta</span>
+              </span>
+              <button class="pocket-saver-btn" id="pocketSaverBtn" type="button" aria-label="Pocket Display Saver" title="Dim screen for pocket">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span>Pocket</span>
+              </button>
               <button class="icon-btn-torch" id="torchBtn" type="button" aria-label="Toggle flashlight" title="Toggle Flashlight">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </button>
@@ -176,6 +184,20 @@
             <button class="icon-btn-settings" data-nav="settings" type="button" aria-label="Open settings">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </button>
+          </div>
+
+          <!-- Pocket Blackout Screen Saver for Wearable / Ray-Ban Mode -->
+          <div class="pocket-blackout-overlay" id="pocketOverlay" style="display: none;" role="dialog" aria-modal="true" aria-label="Pocket Screen Saver Active">
+            <div class="pocket-content">
+              <div class="pocket-pulse-ring">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><line x1="14" y1="15" x2="10" y2="15"/><path d="M2.5 13L5 7c.7-1.3 2-2 3.5-2h7c1.5 0 2.8.7 3.5 2l2.5 6"/>
+                </svg>
+              </div>
+              <h2 class="pocket-title">Ray-Ban Meta Wearable Active</h2>
+              <p class="pocket-sub">Phone in pocket &middot; Audio navigation running.</p>
+              <div class="pocket-tap-prompt">Tap anywhere to wake display</div>
+            </div>
           </div>
 
           <!-- Video / Canvas Live Viewport with Accessible Touch Gestures -->
@@ -356,25 +378,41 @@
           </div>
 
           <h3 class="settings-section-title">Voice &amp; Language</h3>
-          <div class="setting-card-row" id="voiceSettingRow" style="cursor: pointer;" title="Tap to test voice speech">
+          <div class="setting-card-row">
             <span class="setting-row-ic" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             </span>
-            <div class="setting-row-main">English (US)<small>Tap to test voice speech</small></div>
+            <div class="setting-row-main">Voice Language<small>Multilingual guidance &amp; translation</small></div>
+            <select id="languageSelect" class="lang-select-dropdown" aria-label="Select Voice Language">
+              <option value="en">🇺🇸 English (US)</option>
+              <option value="es">🇪🇸 Español (Spanish)</option>
+              <option value="bn">🇧🇩 বাংলা (Bengali)</option>
+              <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+              <option value="fr">🇫🇷 Français (French)</option>
+              <option value="ar">🇸🇦 العربية (Arabic)</option>
+            </select>
+          </div>
+
+          <div class="setting-card-row" id="voiceSettingRow" style="cursor: pointer;" title="Tap to test voice speech">
+            <span class="setting-row-ic" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </span>
+            <div class="setting-row-main">Test Voice Output<small>Play audio sample in selected language</small></div>
             <span class="history-chevron">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
             </span>
           </div>
 
+          <h3 class="settings-section-title">Sensory &amp; Spatial Assistance</h3>
           <div class="setting-card-row">
             <span class="setting-row-ic" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><line x1="14" y1="15" x2="10" y2="15"/><path d="M2.5 13L5 7c.7-1.3 2-2 3.5-2h7c1.5 0 2.8.7 3.5 2l2.5 6"/>
+              </svg>
             </span>
-            <div class="setting-row-main">Language (Optional)<small>Bangla (বাংলা)</small></div>
-            <button class="toggle-switch" id="banglaToggle" type="button" role="switch" aria-checked="false" aria-label="Bangla language toggle"></button>
+            <div class="setting-row-main">Meta Ray-Ban Glasses Mode<small>Open-ear acoustic tuning &amp; pocket display saver</small></div>
+            <button class="toggle-switch" id="raybanToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Meta Ray-Ban Smart Glasses mode"></button>
           </div>
-
-          <h3 class="settings-section-title">Sensory &amp; Spatial Assistance</h3>
           <div class="setting-card-row">
             <span class="setting-row-ic" aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>

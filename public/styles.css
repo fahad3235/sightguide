@@ -2769,6 +2769,138 @@ button:active,
   gap: 8px;
 }
 
+/* ==========================================================================
+   Meta Ray-Ban Smart Glasses Mode & Multilingual Guidance
+   ========================================================================== */
+.lang-select-dropdown {
+  background: var(--color-slate-100, #f1f5f9);
+  color: var(--ink-primary, #0f172a);
+  border: 1px solid var(--border-light, #cbd5e1);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lang-select-dropdown:focus {
+  border-color: var(--blue, #185ee0);
+  box-shadow: 0 0 0 3px rgba(24, 94, 224, 0.15);
+}
+
+.rayban-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  animation: pulseRayban 2.5s infinite;
+}
+
+@keyframes pulseRayban {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.pocket-saver-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pocket-saver-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.pocket-blackout-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000000;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pocket-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 320px;
+}
+
+.pocket-pulse-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  border: 2px solid rgba(16, 185, 129, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pocketPulse 2s infinite ease-in-out;
+}
+
+@keyframes pocketPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+  50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(16, 185, 129, 0.45); }
+}
+
+.pocket-title {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.pocket-sub {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pocket-tap-prompt {
+  margin-top: 18px;
+  color: #10b981;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px dashed rgba(16, 185, 129, 0.4);
+}
+
 /* Reduced motion accessibility fallback */
 @media (prefers-reduced-motion: reduce) {
 
