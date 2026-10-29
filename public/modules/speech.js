@@ -333,43 +333,38 @@ export function playChime(type = "ok", position = "center") {
 export function unlockSpeech() {
   if (typeof window === "undefined") return;
 
-  // 1. Resume Web Audio Context if suspended
+  // 1. Resume Web Audio Context & play a tiny 1-sample silent PCM buffer to unlock mobile audio stack
   const ctx = getAudioContext();
-  if (ctx && ctx.state === "suspended") {
-    ctx.resume().catch(() => {});
+  if (ctx) {
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
+    try {
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+    } catch {}
   }
 
-  // 2. Resume SpeechSynthesis safely and prime voices
+  // 2. Resume & prime SpeechSynthesis safely
   if ("speechSynthesis" in window) {
     try {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
-      // Force Chromium/WebKit to load voices into cache on user gesture
       window.speechSynthesis.getVoices();
-    } catch {}
-  }
-
-  // 3. Prime HTML5 Audio element on touch/pointer gesture
-  if (!currentAudioEl && typeof Audio !== "undefined") {
-    try {
-      currentAudioEl = new Audio();
-      currentAudioEl.setAttribute("playsinline", "true");
-      currentAudioEl.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
-      currentAudioEl.volume = 0.01;
-      const p = currentAudioEl.play();
-      if (p !== undefined) {
-        p.then(() => {
-          currentAudioEl.pause();
-          currentAudioEl.volume = 1.0;
-        }).catch(() => {});
-      }
     } catch {}
   }
 }
 
 let cachedEnglishVoice = null;
 let cachedVoices = {};
+
+function isMobileDevice() {
+  return typeof navigator !== "undefined" && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || "");
+}
 
 export function getBestVoiceForLanguage(targetLang = "en") {
   if (cachedVoices[targetLang]) return cachedVoices[targetLang];
@@ -381,6 +376,15 @@ export function getBestVoiceForLanguage(targetLang = "en") {
   const langVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith(prefix) || v.lang.toLowerCase().replace("_", "-").startsWith(prefix)));
   if (!langVoices.length) {
     return targetLang === "en" ? null : getBestEnglishVoice();
+  }
+
+  // On mobile phones (Android / iOS):
+  // Never assign an uninstalled or network-only voice object because Android TTS silently stalls.
+  // Prefer default voice or locally installed service.
+  if (isMobileDevice()) {
+    const localMatch = langVoices.find(v => v.default) || langVoices.find(v => v.localService) || langVoices[0];
+    cachedVoices[targetLang] = localMatch;
+    return localMatch;
   }
 
   function scoreVoice(v) {
@@ -408,6 +412,12 @@ export function getBestEnglishVoice() {
   // Search specifically for English voices
   const enVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith("en") || v.lang.toLowerCase().startsWith("en-") || v.lang.toLowerCase().startsWith("en_")));
   if (!enVoices.length) return null;
+
+  if (isMobileDevice()) {
+    const localMatch = enVoices.find(v => v.default) || enVoices.find(v => v.localService) || enVoices[0];
+    cachedEnglishVoice = localMatch;
+    return localMatch;
+  }
 
   function scoreVoice(v) {
     const name = (v.name || "").toLowerCase();
@@ -497,42 +507,12 @@ async function playServerAudioTts(text, opts = {}) {
     }
   }
 
-  // Try HTML5 Audio element first (most reliable on Android & iOS mobile browsers)
-  try {
-    if (!currentAudioEl && typeof Audio !== "undefined") {
-      currentAudioEl = new Audio();
-      currentAudioEl.setAttribute("playsinline", "true");
-    }
-    if (currentAudioEl) {
-      currentAudioEl.pause();
-      currentAudioEl.currentTime = 0;
-      currentAudioEl.src = url;
-      currentAudioEl.volume = typeof opts.volume === "number" ? opts.volume : 1.0;
-      const playPromise = currentAudioEl.play();
-      if (playPromise !== undefined) {
-        await playPromise;
-        emitSpeechEvent(true, localized);
-        if (typeof opts.onStart === "function") opts.onStart();
-        currentAudioEl.onended = () => {
-          handleEnd();
-        };
-        currentAudioEl.onerror = () => {
-          handleEnd();
-        };
-        return true;
-      }
-    }
-  } catch {
-    // HTML5 play blocked or delayed, fallback to Web Audio PCM
-  }
-
-  // Fallback: Web Audio Context decode
+  // 1. Try Web Audio Context decode first (immune to mobile HTML5 Audio tag autoplay restrictions)
   const ctx = getAudioContext();
-  if (ctx) {
+  if (ctx && ctx.state !== "suspended") {
     try {
-      if (ctx.state === "suspended") await ctx.resume();
       const res = await fetch(url);
-      if (!res.ok) throw new Error("TTS fetch failed");
+      if (!res.ok) throw new Error("TTS fetch failed: " + res.status);
       const arrayBuffer = await res.arrayBuffer();
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
 
@@ -542,9 +522,25 @@ async function playServerAudioTts(text, opts = {}) {
 
       const source = ctx.createBufferSource();
       source.buffer = audioBuffer;
-      source.connect(ctx.destination);
-      currentBufferSource = source;
 
+      let destination = ctx.destination;
+      if (spatialAudioEnabled && typeof ctx.createStereoPanner === "function" && opts.position) {
+        try {
+          const panner = ctx.createStereoPanner();
+          if (opts.position === "left") panner.pan.setValueAtTime(-0.80, ctx.currentTime);
+          else if (opts.position === "right") panner.pan.setValueAtTime(0.80, ctx.currentTime);
+          else panner.pan.setValueAtTime(0.0, ctx.currentTime);
+          source.connect(panner);
+          panner.connect(ctx.destination);
+          destination = null;
+        } catch {}
+      }
+
+      if (destination) {
+        source.connect(destination);
+      }
+
+      currentBufferSource = source;
       source.onended = () => {
         if (currentBufferSource === source) currentBufferSource = null;
         handleEnd();
@@ -554,18 +550,33 @@ async function playServerAudioTts(text, opts = {}) {
       emitSpeechEvent(true, localized);
       if (typeof opts.onStart === "function") opts.onStart();
       return true;
-    } catch {
-      isSpeaking = false;
-      currentSpokenText = "";
-      emitSpeechEvent(false);
-      return false;
-    }
+    } catch {}
   }
 
-  isSpeaking = false;
-  currentSpokenText = "";
-  emitSpeechEvent(false);
-  return false;
+  // 2. HTML5 Audio Element fallback
+  try {
+    if (!currentAudioEl && typeof Audio !== "undefined") {
+      currentAudioEl = new Audio();
+      currentAudioEl.setAttribute("playsinline", "true");
+    }
+    if (currentAudioEl) {
+      currentAudioEl.pause();
+      currentAudioEl.src = url;
+      currentAudioEl.volume = typeof opts.volume === "number" ? opts.volume : 1.0;
+      currentAudioEl.onended = () => handleEnd();
+      currentAudioEl.onerror = () => handleEnd();
+      const p = currentAudioEl.play();
+      if (p !== undefined) {
+        await p;
+        emitSpeechEvent(true, localized);
+        if (typeof opts.onStart === "function") opts.onStart();
+        return true;
+      }
+    }
+  } catch {
+    handleEnd();
+    return false;
+  }
 }
 
 function executeSpeak(cleanText, opts = {}) {
@@ -574,110 +585,125 @@ function executeSpeak(cleanText, opts = {}) {
 
   isSpeaking = true;
   currentSpokenText = localizedText;
+
+  // If a chime is requested, play chime first and briefly offset speech so words aren't drowned out
   if (opts.chime && opts.chime !== "none") {
     playChime(opts.chime, opts.position || "center");
+    setTimeout(() => {
+      runVoiceSynthesis();
+    }, 110);
+    return true;
   }
 
-  let nativeStarted = false;
-  let fallbackTimer = null;
+  return runVoiceSynthesis();
 
-  // Safety watchdog: If native speech does not produce sound within 1500ms and is NOT speaking,
-  // seamlessly switch to audio so the user ALWAYS hears speech!
-  fallbackTimer = setTimeout(() => {
-    if (!nativeStarted && isSpeaking) {
-      const isActuallySpeaking = typeof window !== "undefined" && "speechSynthesis" in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending);
-      if (!isActuallySpeaking) {
+  function runVoiceSynthesis() {
+    let nativeStarted = false;
+    let fallbackTimer = null;
+
+    // Safety watchdog: If native speech does not produce sound within 700ms,
+    // seamlessly cancel and switch to audio so the user ALWAYS hears speech!
+    fallbackTimer = setTimeout(() => {
+      if (!nativeStarted && isSpeaking) {
         if (typeof window !== "undefined" && "speechSynthesis" in window) {
           try { window.speechSynthesis.cancel(); } catch {}
         }
         playServerAudioTts(localizedText, { ...opts, skipTranslate: true, lang });
       }
-    }
-  }, 1500);
+    }, 700);
 
-  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    try {
-      if (window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
-      }
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      try {
+        // Chromium on Android: cancel any stuck queue & ensure unpaused
+        try { window.speechSynthesis.cancel(); } catch {}
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
 
-      const u = new SpeechSynthesisUtterance(localizedText);
-      const voice = getBestVoiceForLanguage(lang);
-      if (voice) {
-        u.voice = voice;
-        u.lang = voice.lang || getLangBcp47(lang);
-      } else {
-        u.lang = getLangBcp47(lang);
-      }
+        const u = new SpeechSynthesisUtterance(localizedText);
+        const voice = getBestVoiceForLanguage(lang);
+        if (voice) {
+          u.voice = voice;
+          u.lang = voice.lang || getLangBcp47(lang);
+        } else {
+          u.lang = getLangBcp47(lang);
+        }
 
-      u.rate = typeof opts.rate === "number" ? opts.rate : userSpeechRate;
-      u.pitch = typeof opts.pitch === "number" ? opts.pitch : 1.0;
-      u.volume = typeof opts.volume === "number" ? opts.volume : 1.0;
+        u.rate = typeof opts.rate === "number" ? opts.rate : userSpeechRate;
+        u.pitch = typeof opts.pitch === "number" ? opts.pitch : 1.0;
+        u.volume = typeof opts.volume === "number" ? opts.volume : 1.0;
 
-      if (window.__sightguideUtterances) {
-        window.__sightguideUtterances.add(u);
-      }
+        if (window.__sightguideUtterances) {
+          window.__sightguideUtterances.add(u);
+        }
 
-      const wordCount = cleanText.split(/\s+/).length;
-      const safetyTimeoutMs = Math.max(1800, Math.round((wordCount / 2.0) * 1000) + 1200);
-      if (typeof window !== "undefined") {
+        const wordCount = localizedText.split(/\s+/).length;
+        const safetyTimeoutMs = Math.max(1800, Math.round((wordCount / 1.5) * 1000) + 1200);
+
         clearTimeout(window.__speechSafetyTimer);
         window.__speechSafetyTimer = setTimeout(() => {
-          if (isSpeaking && currentSpokenText === cleanText) {
+          if (isSpeaking) {
+            try { window.speechSynthesis.cancel(); } catch {}
+            if (window.__sightguideUtterances) window.__sightguideUtterances.delete(u);
             isSpeaking = false;
             currentSpokenText = "";
             emitSpeechEvent(false);
+            if (pendingSpeech) {
+              const next = pendingSpeech;
+              pendingSpeech = null;
+              speak(next.text, next.opts);
+            }
           }
         }, safetyTimeoutMs);
+
+        u.onstart = () => {
+          nativeStarted = true;
+          isSpeaking = true;
+          emitSpeechEvent(true, localizedText);
+          if (fallbackTimer) clearTimeout(fallbackTimer);
+          if (typeof opts.onStart === "function") opts.onStart();
+        };
+
+        u.onend = () => {
+          if (fallbackTimer) clearTimeout(fallbackTimer);
+          if (window.__speechSafetyTimer) clearTimeout(window.__speechSafetyTimer);
+          if (window.__sightguideUtterances) window.__sightguideUtterances.delete(u);
+          isSpeaking = false;
+          currentSpokenText = "";
+          emitSpeechEvent(false);
+          if (typeof opts.onEnd === "function") opts.onEnd();
+          if (pendingSpeech) {
+            const next = pendingSpeech;
+            pendingSpeech = null;
+            speak(next.text, next.opts);
+          }
+        };
+
+        u.onerror = (err) => {
+          if (fallbackTimer) clearTimeout(fallbackTimer);
+          if (window.__speechSafetyTimer) clearTimeout(window.__speechSafetyTimer);
+          if (window.__sightguideUtterances) window.__sightguideUtterances.delete(u);
+          isSpeaking = false;
+          currentSpokenText = "";
+          emitSpeechEvent(false);
+          if (err?.error === "canceled" || err?.error === "interrupted") {
+            return;
+          }
+          playServerAudioTts(localizedText, { ...opts, skipTranslate: true, lang });
+        };
+
+        window.speechSynthesis.speak(u);
+        return true;
+      } catch {
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        playServerAudioTts(localizedText, { ...opts, skipTranslate: true, lang });
+        return true;
       }
-
-      u.onstart = () => {
-        nativeStarted = true;
-        isSpeaking = true;
-        emitSpeechEvent(true, cleanText);
-        if (fallbackTimer) clearTimeout(fallbackTimer);
-        if (typeof opts.onStart === "function") opts.onStart();
-      };
-
-      u.onend = () => {
-        if (fallbackTimer) clearTimeout(fallbackTimer);
-        if (window.__speechSafetyTimer) clearTimeout(window.__speechSafetyTimer);
-        if (window.__sightguideUtterances) window.__sightguideUtterances.delete(u);
-        isSpeaking = false;
-        currentSpokenText = "";
-        emitSpeechEvent(false);
-        if (typeof opts.onEnd === "function") opts.onEnd();
-        if (pendingSpeech) {
-          const next = pendingSpeech;
-          pendingSpeech = null;
-          speak(next.text, next.opts);
-        }
-      };
-
-      u.onerror = (err) => {
-        if (fallbackTimer) clearTimeout(fallbackTimer);
-        if (window.__speechSafetyTimer) clearTimeout(window.__speechSafetyTimer);
-        if (window.__sightguideUtterances) window.__sightguideUtterances.delete(u);
-        isSpeaking = false;
-        currentSpokenText = "";
-        emitSpeechEvent(false);
-        if (err?.error === "canceled" || err?.error === "interrupted") {
-          return;
-        }
-        playServerAudioTts(cleanText, opts);
-      };
-
-      window.speechSynthesis.speak(u);
-      return true;
-    } catch {
+    } else {
       if (fallbackTimer) clearTimeout(fallbackTimer);
-      playServerAudioTts(cleanText, opts);
+      playServerAudioTts(localizedText, { ...opts, skipTranslate: true, lang });
       return true;
     }
-  } else {
-    if (fallbackTimer) clearTimeout(fallbackTimer);
-    playServerAudioTts(cleanText, opts);
-    return true;
   }
 }
 
@@ -688,7 +714,7 @@ export function speak(text, opts = {}) {
 
   unlockSpeech();
 
-  // If immediate flag is specified (e.g. stop command, emergency, or fresh new camera analysis):
+  // If immediate flag is specified (e.g. stop command, emergency, or user tap on Test Voice):
   if (opts.immediate) {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       try { window.speechSynthesis.cancel(); } catch {}
@@ -703,10 +729,9 @@ export function speak(text, opts = {}) {
     currentSpokenText = "";
     pendingSpeech = null;
 
-    // Small 25ms delay allows mobile Android OS TTS service to cycle without swallowing utterance
     setTimeout(() => {
       executeSpeak(cleanText, opts);
-    }, 25);
+    }, 20);
     return true;
   }
 

@@ -82,8 +82,9 @@ document.querySelectorAll("[data-nav]").forEach((b) => {
 });
 
 $("headerTestVoiceBtn")?.addEventListener("click", () => {
+  tactileHaptic("confirm");
   unlockSpeech();
-  speak("SightGuide voice is active. Sound is working properly.");
+  speak("SightGuide voice is active. Sound is working properly.", { immediate: true, chime: "ok" });
 });
 
 $("headerStartLiveBtn")?.addEventListener("click", () => {
@@ -868,10 +869,9 @@ async function startCamera() {
     if (els.livePill) els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">META AI LIVE</span>';
     const stopBtn = $("stopCameraBtn");
     if (stopBtn) stopBtn.disabled = false;
-    playChime("ok");
-    speak("Camera active. Meta AI vision is scanning ahead.");
+    speak("Camera active. Meta AI vision is scanning ahead.", { immediate: true, chime: "ok" });
     startCameraRenderLoop();
-    scheduleNextCameraFrame(100);
+    scheduleNextCameraFrame(1200);
   } catch (err) {
     console.warn("Camera failed:", err?.name, err?.message);
     const reasons = {
@@ -1157,10 +1157,11 @@ function startDemo() {
   resetSession();
   updateStopButtonState(true);
   if (els.livePill) els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">LIVE DEMO</span>';
-  playChime("ok");
-  speak("Demo mode started. Live guidance active.");
-  tickDemo();
-  timer = setInterval(tickDemo, 1800);
+  speak("Demo mode started. Live guidance active.", { immediate: true, chime: "ok" });
+  setTimeout(() => {
+    tickDemo();
+    timer = setInterval(tickDemo, 1800);
+  }, 1200);
 }
 
 function stopAll() {
@@ -1228,40 +1229,35 @@ $("photoFallbackInput")?.addEventListener("change", (e) => {
 });
 
 $("getStartedBtn")?.addEventListener("click", () => {
-  tactileHaptic();
+  tactileHaptic("confirm");
   unlockSpeech();
-  playChime("ok");
-  speak("Welcome to SightGuide. Camera access required for live guidance.");
+  speak("Welcome to SightGuide. Camera access required for live guidance.", { immediate: true, chime: "ok" });
   showScreen("permission");
 });
 
 $("tryDemoBtn")?.addEventListener("click", () => {
-  tactileHaptic();
+  tactileHaptic("confirm");
   unlockSpeech();
-  playChime("ok");
   startDemo();
 });
 
 $("testVoiceBtn")?.addEventListener("click", () => {
-  tactileHaptic();
+  tactileHaptic("confirm");
   unlockSpeech();
-  playChime("ok");
-  speak("SightGuide voice is active. Sound is working properly.");
+  speak("SightGuide voice is active. Sound is working properly.", { immediate: true, chime: "ok" });
 });
 
 $("allowCameraBtn")?.addEventListener("click", () => {
-  tactileHaptic();
+  tactileHaptic("confirm");
   unlockSpeech();
-  playChime("ok");
-  speak("Starting camera and Meta AI vision.");
+  speak("Starting camera and Meta AI vision.", { immediate: true, chime: "ok" });
   startCamera();
 });
 
 $("startCameraBtn")?.addEventListener("click", () => {
-  tactileHaptic();
+  tactileHaptic("confirm");
   unlockSpeech();
-  playChime("ok");
-  speak("Starting camera.");
+  speak("Starting camera.", { immediate: true, chime: "ok" });
   startCamera();
 });
 
@@ -1615,7 +1611,7 @@ if (viewportEl) {
 if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("./sw.js?v=3.7.0", { updateViaCache: "none" })
+      .register("./sw.js?v=3.8.0", { updateViaCache: "none" })
       .then((reg) => {
         reg.update().catch(() => {});
       })
@@ -1651,13 +1647,13 @@ if (forceUpdateBtn) {
     }
 
     try {
-      localStorage.setItem("sightguide_app_ver", "3.7.0");
+      localStorage.setItem("sightguide_app_ver", "3.8.0");
     } catch (e) {}
 
     // Force reload with cache-busting timestamp parameter
     setTimeout(() => {
       const cleanUrl = window.location.origin + window.location.pathname;
-      window.location.href = `${cleanUrl}?v=3.7.0&t=${Date.now()}`;
+      window.location.href = `${cleanUrl}?v=3.8.0&t=${Date.now()}`;
     }, 400);
   });
 }

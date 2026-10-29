@@ -1,5 +1,5 @@
-// SightGuide PWA Service Worker v3.7
-const CACHE_NAME = "sightguide-shell-v3.7";
+// SightGuide PWA Service Worker v3.8
+const CACHE_NAME = "sightguide-shell-v3.8";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
