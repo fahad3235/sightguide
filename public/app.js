@@ -1611,10 +1611,54 @@ if (viewportEl) {
   }, { passive: false });
 }
 
-// Register PWA Service Worker for offline shell & instant launch
+// Register PWA Service Worker for offline shell & instant launch (updateViaCache: "none")
 if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker
+      .register("./sw.js?v=3.7.0", { updateViaCache: "none" })
+      .then((reg) => {
+        reg.update().catch(() => {});
+      })
+      .catch(() => {});
+  });
+}
+
+// Wire Force Update / Cache Purge Button
+const forceUpdateBtn = $("forceUpdateBtn");
+if (forceUpdateBtn) {
+  forceUpdateBtn.addEventListener("click", async () => {
+    tactileHaptic("confirm");
+    speak("Purging cache and updating to latest version. Reloading now.", { immediate: true });
+
+    // Purge CacheStorage
+    if ("caches" in window) {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      } catch (err) {
+        console.warn("Failed clearing caches", err);
+      }
+    }
+
+    // Unregister existing service workers
+    if ("serviceWorker" in navigator) {
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      } catch (err) {
+        console.warn("Failed unregistering SW", err);
+      }
+    }
+
+    try {
+      localStorage.setItem("sightguide_app_ver", "3.7.0");
+    } catch (e) {}
+
+    // Force reload with cache-busting timestamp parameter
+    setTimeout(() => {
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.location.href = `${cleanUrl}?v=3.7.0&t=${Date.now()}`;
+    }, 400);
   });
 }
 

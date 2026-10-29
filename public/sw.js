@@ -29,7 +29,17 @@ const SHELL_ASSETS = [
 self.addEventListener("install", (evt) => {
   evt.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(SHELL_ASSETS).catch(() => {});
+      return Promise.all(
+        SHELL_ASSETS.map((url) => {
+          return fetch(url, { cache: "reload" })
+            .then((res) => {
+              if (res && res.status === 200) {
+                return cache.put(url, res);
+              }
+            })
+            .catch(() => {});
+        })
+      );
     })
   );
   self.skipWaiting();

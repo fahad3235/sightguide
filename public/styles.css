@@ -282,6 +282,20 @@ select {
   white-space: nowrap;
 }
 
+.brand-ver-badge {
+  font-size: 0.65rem;
+  background: var(--color-blue-primary, #185ee0);
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-left: 5px;
+  vertical-align: middle;
+  display: inline-block;
+  line-height: 1.4;
+}
+
 @media (max-width: 1250px) {
   .header-tagline {
     display: none;
