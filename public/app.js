@@ -72,7 +72,11 @@ document.querySelectorAll("[data-nav]").forEach((b) => {
   b.addEventListener("click", (e) => {
     e.preventDefault();
     unlockSpeech();
-    showScreen(b.dataset.nav);
+    const target = b.dataset.nav;
+    showScreen(target);
+    if (target === "live" && mode === "idle") {
+      startCamera();
+    }
   });
 });
 
@@ -314,20 +318,17 @@ function addHistory(text, label, whenMs) {
 }
 
 function drawCameraFrame(canvas) {
-  // Camera mode: paint the REAL video frame. Never paint the staged demo
-  // scene over a live camera feed (that hid the camera even when granted).
   const ctx = canvas.getContext("2d");
   const v = els.liveVideo;
-  if (v && v.readyState >= 2 && v.videoWidth > 0) {
+
+  // Clear canvas transparently so the native hardware-accelerated <video> tag is 100% visible underneath
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // If user explicitly chose "Overlay Only" in Settings (which hides the <video> element), paint the video frame to canvas
+  if (v && v.style.visibility === "hidden" && v.readyState >= 2 && v.videoWidth > 0) {
     ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-    return true;
   }
-  ctx.fillStyle = "#050b16";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "16px sans-serif";
-  ctx.fillText("Waiting for camera…", 16, 28);
-  return false;
+  return Boolean(v && v.readyState >= 2 && v.videoWidth > 0);
 }
 
 function renderCurrentFrame() {
@@ -344,10 +345,13 @@ function renderCurrentFrame() {
     if (mode === "camera") {
       drawCameraFrame(canvas);
       drawMaskOverlay(canvas, currentRankedTracks, "META AI · REAL-TIME VISION", overlay);
-    } else {
+    } else if (mode === "demo") {
       const demoTracks = currentRankedTracks.length ? currentRankedTracks : defaultMockTracks;
       drawDemoScene(canvas, demoTracks, frameCount, activeScenarioId);
       drawMaskOverlay(canvas, demoTracks, "DEMO MASK", overlay);
+    } else {
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
   }
 }
@@ -686,18 +690,44 @@ async function startCamera() {
   }
 
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false
-    });
+    let mediaStream = null;
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+    } catch (e1) {
+      console.warn("Retrying camera with environment constraint:", e1?.name);
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false
+        });
+      } catch (e2) {
+        console.warn("Retrying camera with basic video constraint:", e2?.name);
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      }
+    }
+    stream = mediaStream;
     mode = "camera";
     hideCameraBanner();
     if (els.liveVideo) {
+      els.liveVideo.removeAttribute("poster");
       els.liveVideo.srcObject = stream;
       els.liveVideo.muted = true;
       els.liveVideo.playsInline = true;
-      await els.liveVideo.play().catch(() => {});
+      els.liveVideo.setAttribute("playsinline", "true");
+      els.liveVideo.setAttribute("webkit-playsinline", "true");
+      els.liveVideo.style.display = "block";
+      els.liveVideo.style.visibility = "visible";
+      els.liveVideo.style.opacity = "1";
+      try {
+        await els.liveVideo.play();
+      } catch (playErr) {
+        console.warn("Video play() notice:", playErr);
+      }
     }
+    updateStopButtonState(true);
     if (els.livePill) els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">META AI LIVE</span>';
     const stopBtn = $("stopCameraBtn");
     if (stopBtn) stopBtn.disabled = false;
@@ -832,6 +862,40 @@ async function tickCamera() {
   }
 }
 
+function updateStopButtonState(isRunning) {
+  const stopButtons = document.querySelectorAll(".btn-stop-main, #stopBtn, #dpStop");
+  stopButtons.forEach((btn) => {
+    const iconDiv = btn.querySelector(".stop-icon-square, .stop-icon, .play-icon-triangle");
+    const labelSpan = btn.querySelector(".stop-label") || btn;
+    if (isRunning) {
+      btn.classList.remove("btn-start-state");
+      btn.setAttribute("aria-label", "Stop navigation");
+      if (iconDiv) iconDiv.className = "stop-icon-square";
+      if (labelSpan && labelSpan !== btn) labelSpan.textContent = "Stop";
+      else btn.textContent = "Stop";
+    } else {
+      btn.classList.add("btn-start-state");
+      btn.setAttribute("aria-label", "Start navigation");
+      if (iconDiv) iconDiv.className = "stop-icon play-icon-triangle";
+      if (labelSpan && labelSpan !== btn) labelSpan.textContent = "Start";
+      else btn.textContent = "Start";
+    }
+  });
+}
+
+function handleStopToggle() {
+  tactileHaptic();
+  if (mode === "camera" || mode === "demo") {
+    playChime("alert");
+    speak("Navigation stopped.");
+    stopAll();
+  } else {
+    playChime("ok");
+    speak("Starting camera and Meta AI vision.");
+    startCamera();
+  }
+}
+
 function startDemo() {
   showScreen("live");
   stopCameraTracks();
@@ -840,7 +904,8 @@ function startDemo() {
   mode = "demo";
   paused = false;
   resetSession();
-  if (els.livePill) els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">LIVE</span>';
+  updateStopButtonState(true);
+  if (els.livePill) els.livePill.innerHTML = '<span class="live-pill-dot"></span><span class="live-pill-txt">LIVE DEMO</span>';
   playChime("ok");
   speak("Demo mode started. Live guidance active.");
   tickDemo();
@@ -855,6 +920,26 @@ function stopAll() {
   mode = "idle";
   paused = false;
   resetSession();
+  updateStopButtonState(false);
+  if (els.livePill) {
+    els.livePill.innerHTML = '<span class="live-pill-dot gray"></span><span class="live-pill-txt">STOPPED</span>';
+  }
+  if (els.guidanceText) {
+    els.guidanceText.textContent = "Navigation stopped. Tap Start to resume.";
+  }
+  if (els.dpGuidance) {
+    els.dpGuidance.textContent = "Navigation stopped. Tap Start to resume.";
+  }
+  if (els.metaDistance) {
+    els.metaDistance.textContent = "Idle";
+  }
+  if (els.dpMeta) {
+    els.dpMeta.textContent = "Idle";
+  }
+  if (els.chipRow) {
+    els.chipRow.innerHTML = '<span class="obj-chip"><span>Idle</span></span><span class="obj-chip">Stopped</span>';
+  }
+  renderCurrentFrame();
 }
 
 /* Event listeners */
@@ -918,25 +1003,11 @@ $("startCameraBtn")?.addEventListener("click", () => {
   startCamera();
 });
 
-$("stopCameraBtn")?.addEventListener("click", () => {
-  tactileHaptic();
-  playChime("alert");
-  speak("Camera stopped.");
-  stopAll();
-});
-
-$("stopBtn")?.addEventListener("click", () => {
-  tactileHaptic();
-  playChime("alert");
-  speak("Navigation stopped.");
-  stopAll();
-});
-
-$("dpStop")?.addEventListener("click", () => {
-  tactileHaptic();
-  playChime("alert");
-  speak("Navigation stopped.");
-  stopAll();
+$("stopCameraBtn")?.addEventListener("click", handleStopToggle);
+$("stopBtn")?.addEventListener("click", handleStopToggle);
+$("dpStop")?.addEventListener("click", handleStopToggle);
+document.querySelectorAll(".btn-stop-main").forEach((b) => {
+  b.addEventListener("click", handleStopToggle);
 });
 
 $("startDemoBtn")?.addEventListener("click", () => { unlockSpeech(); startDemo(); });

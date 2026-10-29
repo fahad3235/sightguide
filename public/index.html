@@ -171,7 +171,7 @@
 
           <!-- Video / Canvas Live Viewport -->
           <div class="viewport-container">
-            <video id="liveVideo" autoplay playsinline muted poster="assets/live_scene_pedestrian.jpg"></video>
+            <video id="liveVideo" autoplay playsinline webkit-playsinline muted poster="assets/live_scene_pedestrian.jpg"></video>
             <canvas id="sampleCanvas" width="640" height="440"></canvas>
           </div>
 
@@ -575,7 +575,7 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               <span>Demo Mode</span>
             </button>
-            <button class="btn-stop-main" data-nav="live" type="button" aria-label="Stop navigation">
+            <button class="btn-stop-main" id="stopBtnExpanded" type="button" aria-label="Stop navigation">
               <div class="stop-icon-square"></div>
               <span class="stop-label">Stop</span>
             </button>

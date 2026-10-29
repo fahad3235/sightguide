@@ -1463,6 +1463,32 @@ h1, h2, h3, h4, .desktop-panel h2, .screen-head h2, .board-header h2 {
   color: var(--color-card-white);
 }
 
+.btn-stop-main.btn-start-state {
+  background: #10b981 !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.45) !important;
+}
+
+.btn-stop-main.btn-start-state:hover {
+  background: #059669 !important;
+}
+
+.play-icon-triangle {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 0 8px 14px;
+  border-color: transparent transparent transparent #ffffff;
+  margin-bottom: 2px;
+  margin-left: 3px;
+}
+
+.live-pill-dot.gray {
+  background: #94a3b8 !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
 /* ==========================================================================
    Screen 4: Navigation History Screen
    ========================================================================== */
